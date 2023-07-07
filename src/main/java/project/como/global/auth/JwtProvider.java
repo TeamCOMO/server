@@ -3,6 +3,9 @@ package project.como.global.auth;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -24,13 +28,18 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
 
-	private final Key key;
+	private Key key;
+	@Value("${jwt.secret}")
+	private String secretKey;
+	private final String BEARER_PREFIX = "Bearer ";
 
-	public JwtProvider(@Value("${jwt.secret}") String secretKey) {
+	@PostConstruct
+	public void init() {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-		this.key = Keys.hmacShaKeyFor(keyBytes);
+		key = Keys.hmacShaKeyFor(keyBytes);
 	}
 
 	public TokenInfo generateToken(Authentication authentication) {
@@ -43,7 +52,7 @@ public class JwtProvider {
 		String accessToken = Jwts.builder()
 				.setSubject(authentication.getName())
 				.claim("auth", authorities)
-				.setExpiration(new Date(now + 1000 * 60 * 60 * 24))
+				.setExpiration(new Date(now + 1000 * 60 * 60))
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 
@@ -57,6 +66,38 @@ public class JwtProvider {
 				.accessToken(accessToken)
 				.refreshToken(refreshToken)
 				.build();
+	}
+
+	public String createAccessToken(String userId) {
+		Date date = new Date();
+		return BEARER_PREFIX + Jwts.builder()
+				.setSubject(userId)
+				.claim("auth", "USER")
+				.setExpiration(new Date(date.getTime() + 1000 * 60 * 60))
+				.setIssuedAt(date)
+				.signWith(key, SignatureAlgorithm.HS256)
+				.compact();
+	}
+
+	public String createRefreshToken(String userId) {
+		Date date = new Date();
+		return BEARER_PREFIX + Jwts.builder()
+				.setSubject(userId)
+				.setExpiration(new Date(date.getTime() + 1000 * 60 * 60 * 24 * 14))
+				.setIssuedAt(date)
+				.signWith(key, SignatureAlgorithm.HS256)
+				.compact();
+	}
+
+	public Cookie createCookie(String userId) {
+		String cookieName = "refreshToken";
+		String cookieValue = createRefreshToken(userId);
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setPath("/");
+		cookie.setMaxAge(60 * 60 * 24);
+		return cookie;
 	}
 
 	public Authentication getAuthentication(String accessToken) {
