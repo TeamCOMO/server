@@ -5,6 +5,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -43,23 +45,19 @@ public class JwtProvider {
 	}
 
 	public TokenInfo generateToken(Authentication authentication) {
-		String authorities = authentication.getAuthorities().stream()
+		return generateToken(authentication.getName(), authentication.getAuthorities());
+	}
+
+	public TokenInfo generateToken(String name, Collection<? extends GrantedAuthority> inputAuthorities) {
+		String authorities = inputAuthorities.stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(","));
 
 		long now = (new Date()).getTime();
 
-		String accessToken = Jwts.builder()
-				.setSubject(authentication.getName())
-				.claim("auth", authorities)
-				.setExpiration(new Date(now + 1000 * 60 * 60))
-				.signWith(key, SignatureAlgorithm.HS256)
-				.compact();
+		String accessToken = createAccessToken(name, authorities);
 
-		String refreshToken = Jwts.builder()
-				.setExpiration(new Date(now + 1000 * 60 * 60 * 24 * 14))
-				.signWith(key, SignatureAlgorithm.HS256)
-				.compact();
+		String refreshToken = createRefreshToken(name);
 
 		return TokenInfo.builder()
 				.grantType("Bearer")
@@ -68,21 +66,22 @@ public class JwtProvider {
 				.build();
 	}
 
-	public String createAccessToken(String userId) {
+	public String createAccessToken(String name, String authorities) {
 		Date date = new Date();
 		return BEARER_PREFIX + Jwts.builder()
-				.setSubject(userId)
-				.claim("auth", "USER")
+				.setSubject(name)
+				.claim("auth", authorities)
+				.claim("type", "access")
 				.setExpiration(new Date(date.getTime() + 1000 * 60 * 60))
 				.setIssuedAt(date)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 	}
 
-	public String createRefreshToken(String userId) {
+	public String createRefreshToken(String name) {
 		Date date = new Date();
 		return BEARER_PREFIX + Jwts.builder()
-				.setSubject(userId)
+				.claim("type", "refresh")
 				.setExpiration(new Date(date.getTime() + 1000 * 60 * 60 * 24 * 14))
 				.setIssuedAt(date)
 				.signWith(key, SignatureAlgorithm.HS256)
@@ -113,6 +112,19 @@ public class JwtProvider {
 
 		UserDetails principal = new User(claims.getSubject(), "", authorities);
 		return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+	}
+
+	public boolean isRefreshToken(String token) {
+		String type = (String) Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("type");
+		return type.equals("refresh");
+	}
+
+	public String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer"))
+			return bearerToken.substring(7);
+		return null;
 	}
 
 	public boolean validateToken(String token) {
