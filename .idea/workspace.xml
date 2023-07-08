@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b91e9bb3-3747-4188-ad86-09ee2a40df59" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/project/como/domain/post/model/Post.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/project/como/domain/post/model/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/project/como/domain/post/model/Post.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +139,7 @@
       <workItem from="1688717519815" duration="3263000" />
       <workItem from="1688720819454" duration="4323000" />
       <workItem from="1688734993868" duration="45000" />
-      <workItem from="1688739243659" duration="551000" />
+      <workItem from="1688739243659" duration="1997000" />
     </task>
     <servers />
   </component>
