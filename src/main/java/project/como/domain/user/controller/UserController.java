@@ -23,14 +23,14 @@ public class UserController {
 	private final CustomUserDetailsService customUserDetailsService;
 	private final JwtProvider jwtProvider;
 
-	@PostMapping("/signup")
+	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@RequestBody MemberSignupRequestDto dto) throws Exception {
 		userServiceImpl.signUp(dto);
 
 		return ResponseEntity.ok("success");
 	}
 
-	@PostMapping("/signin")
+	@PostMapping("/sign-in")
 	public ResponseEntity<?> signIn(HttpServletRequest request, @RequestBody MemberLoginRequestDto dto) {
 		return userServiceImpl.signIn(request, dto);
 	}
