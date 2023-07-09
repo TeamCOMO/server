@@ -1,0 +1,20 @@
+jwt:
+  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/como
+    username: root
+    password: 1234
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    org.springframework.security: DEBUG
