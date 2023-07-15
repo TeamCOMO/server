@@ -11,8 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import project.como.global.auth.JwtProvider;
-import project.como.global.filter.JwtAuthenticationFilter;
+import project.como.global.auth.service.JwtProvider;
+import project.como.global.auth.filter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -30,9 +30,9 @@ public class SecurityConfig {
 				.and()
 				.authorizeHttpRequests()
 				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/login")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/test")).hasRole("USER")
-				.requestMatchers(new AntPathRequestMatcher("/DB_USERNAME/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/user/sign-in")).permitAll()
+				.requestMatchers(new AntPathRequestMatcher("/user/test")).permitAll()
+				.requestMatchers(new AntPathRequestMatcher("/DB_USERNAME/**")).hasRole("어드민")
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);

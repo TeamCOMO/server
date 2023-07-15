@@ -1,4 +1,4 @@
-package project.como.global.auth;
+package project.como.global.auth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -17,13 +17,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import project.como.global.auth.model.TokenInfo;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
