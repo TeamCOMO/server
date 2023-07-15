@@ -1,4 +1,4 @@
-package project.como.global.auth;
+package project.como.global.auth.model;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
