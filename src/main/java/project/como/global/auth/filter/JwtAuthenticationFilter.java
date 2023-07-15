@@ -1,4 +1,4 @@
-package project.como.global.filter;
+package project.como.global.auth.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,9 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import project.como.global.auth.JwtProvider;
+import project.como.global.auth.service.JwtProvider;
 
 import java.io.IOException;
 

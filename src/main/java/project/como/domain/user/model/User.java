@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static jakarta.persistence.GenerationType.*;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,14 +22,18 @@ import java.util.List;
 public class User implements UserDetails {
 
 	@Id
-	@Column(name = "user_id", updatable = false, unique = true, nullable = false)
-	private String userId;
+	@Column(name = "user_id")
+	@GeneratedValue(strategy = IDENTITY)
+	private Long id;
+
+	@Column(name = "username", updatable = false, unique = true, nullable = false)
+	private String username;
 
 	@Column(nullable = false)
 	private String password;
 
-	@Column(name = "username", unique = true, nullable = false)
-	private String name;
+	@Column(name = "nickname", unique = true, nullable = false)
+	private String nickname;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Builder.Default
@@ -62,8 +68,8 @@ public class User implements UserDetails {
 //		this.refreshToken = refreshToken;
 //	}
 
-	public void updateName(String name) {
-		this.name = name;
+	public void updateName(String nickname) {
+		this.nickname = nickname;
 	}
 
 	@Override
@@ -73,7 +79,7 @@ public class User implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return userId;
+		return username;
 	}
 
 	@Override
