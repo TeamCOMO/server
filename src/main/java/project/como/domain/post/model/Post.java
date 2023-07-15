@@ -16,7 +16,7 @@ public class Post extends BaseTimeEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	@Id @Column(name = "post_id")
 	private Long id;
-
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;

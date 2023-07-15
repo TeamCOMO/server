@@ -17,7 +17,7 @@ import java.util.Collections;
 public class MemberSignupRequestDto {
 
 	@NotBlank(message = "아이디를 입력해주세요.")
-	private String userId;
+	private String username;
 
 	@NotBlank(message = "비밀번호를 입력해주세요.")
 	@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,30}$",
@@ -28,7 +28,7 @@ public class MemberSignupRequestDto {
 
 	@NotBlank(message = "닉네임을 입력해주세요.")
 	@Size(min = 2, message = "닉네임은 최소 2자 이상으로 입력해주세요.")
-	private String name;
+	private String nickname;
 
 	@NotBlank(message = "이메일을 입력해주세요.")
 	@Email(message = "이메일 형식에 맞게 입력해주세요.")
@@ -41,9 +41,9 @@ public class MemberSignupRequestDto {
 	@Builder
 	public User toEntity() {
 		return User.builder()
-				.userId(userId)
+				.username(username)
 				.password(password)
-				.name(name)
+				.nickname(nickname)
 				.email(email)
 				.githubUrl(githubUrl)
 				.blogUrl(blogUrl)
