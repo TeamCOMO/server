@@ -4,6 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
@@ -25,7 +28,6 @@ public class UserController {
 
 	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@RequestBody MemberSignupRequestDto dto) throws Exception {
-//		log.info("id : {}", id);
 		userServiceImpl.signUp(dto);
 
 		return ResponseEntity.ok("success");
@@ -36,11 +38,9 @@ public class UserController {
 		return userServiceImpl.signIn(request, dto);
 	}
 
-	@PostMapping("/test")
-	public ResponseEntity<String> test(@RequestParam String username)
-	{
-		UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-		log.info("user : {}", userDetails);
-		return ResponseEntity.ok("success");
+	@GetMapping("/current-test")
+	public ResponseEntity<?> getCurrent(@CurrentUser String username) {
+		User user = userServiceImpl.getUser(username);
+		return ResponseEntity.ok(user);
 	}
 }
