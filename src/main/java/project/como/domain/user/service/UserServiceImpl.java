@@ -54,11 +54,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<?> signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
 
-		log.info("username : {}, password : {}", dto.getUsername(), dto.getPassword());
-
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-		log.info("authentication: {}", authentication);
 
 		TokenInfo tokenInfo = jwtProvider.generateToken(authentication);
 
@@ -69,7 +65,7 @@ public class UserServiceImpl implements UserService {
 				.refreshToken(tokenInfo.getRefreshToken())
 				.build());
 
-		return response.success(tokenInfo);
+		return response.success(tokenInfo.getAccessToken());
 	}
 
 	@Transactional
@@ -97,5 +93,10 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		return response.fail("토큰 갱신에 실패했습니다.");
+	}
+
+	public User getUser(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+		return user;
 	}
 }

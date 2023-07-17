@@ -21,6 +21,7 @@ import project.como.global.auth.model.TokenInfo;
 
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -37,8 +38,8 @@ public class JwtProvider {
 
 	@PostConstruct
 	public void init() {
-		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-		key = Keys.hmacShaKeyFor(keyBytes);
+		String keyBase64Encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
+		key = Keys.hmacShaKeyFor(keyBase64Encoded.getBytes());
 	}
 
 	public TokenInfo generateToken(Authentication authentication) {
@@ -112,7 +113,7 @@ public class JwtProvider {
 	}
 
 	public boolean isRefreshToken(String token) {
-		String type = (String) Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("type");
+		String type = (String) Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("type");
 		return type.equals("refresh");
 	}
 
