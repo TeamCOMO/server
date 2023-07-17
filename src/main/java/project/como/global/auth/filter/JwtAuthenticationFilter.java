@@ -1,4 +1,4 @@
-package project.como.global.filter;
+package project.como.global.auth.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -6,14 +6,15 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import project.como.global.auth.JwtProvider;
+import project.como.global.auth.service.JwtProvider;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
@@ -29,10 +30,13 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 			 * refresh token은 내부적으로 권한 정보가 없기 때문에 getAuthentication 부분에서 Exception이 발생하므로
 			 * 한번 필터링을 해줘야 한다.
 			 */
-			if (!((HttpServletRequest) request).getRequestURI().equals("/user/reissue")) {
-				Authentication authentication = jwtProvider.getAuthentication(token);
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
+
+//			if (!((HttpServletRequest) request).getRequestURI().equals("/user/reissue")) {
+//				Authentication authentication = jwtProvider.getAuthentication(token);
+//				SecurityContextHolder.getContext().setAuthentication(authentication);
+//			}
+			Authentication authentication = jwtProvider.getAuthentication(token);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
 		chain.doFilter(request, response);
 	}

@@ -15,9 +15,10 @@ import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
-import project.como.global.auth.JwtProvider;
-import project.como.global.auth.RefreshToken;
-import project.como.global.auth.TokenInfo;
+import project.como.global.auth.model.CurrentUser;
+import project.como.global.auth.service.JwtProvider;
+import project.como.global.auth.model.RefreshToken;
+import project.como.global.auth.model.TokenInfo;
 import project.como.global.auth.repository.RefreshTokenRedisRepository;
 import project.como.global.common.dto.ApiResponse;
 import project.como.global.common.model.Helper;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	public ResponseEntity<?> signUp(MemberSignupRequestDto dto) throws Exception {
-		if (userRepository.findByUserId(dto.getUserId()).isPresent())
+		if (userRepository.findByUsername(dto.getUsername()).isPresent())
 			throw new Exception("이미 존재하는 아이디입니다.");
 
 		if (!dto.getPassword().equals(dto.getCheckedPassword()))
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	public ResponseEntity<?> signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUserId(), dto.getPassword());
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
 
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
 				.refreshToken(tokenInfo.getRefreshToken())
 				.build());
 
-		return response.success(tokenInfo);
+		return response.success(tokenInfo.getAccessToken());
 	}
 
 	@Transactional
@@ -93,5 +94,10 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		return response.fail("토큰 갱신에 실패했습니다.");
+	}
+
+	public User getUser(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+		return user;
 	}
 }
