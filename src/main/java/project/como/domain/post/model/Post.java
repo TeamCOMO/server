@@ -2,15 +2,23 @@ package project.como.domain.post.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.*;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
 
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
+@Getter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post extends BaseTimeEntity {
 
 	@GeneratedValue(strategy = IDENTITY)
@@ -31,7 +39,7 @@ public class Post extends BaseTimeEntity {
 
 	@Column(nullable = false)
 	@ElementCollection
-	private List<Stack> stacks;
+	private List<Tech> techs;
 
 	@NotBlank
 	private String title;
@@ -39,5 +47,27 @@ public class Post extends BaseTimeEntity {
 	@NotBlank
 	private String body;
 
+	@ColumnDefault("0")
+	@Generated(GenerationTime.ALWAYS)
 	private Long readCount;
+
+	public void modifyTitle(String title) {
+		this.title = title;
+	}
+
+	public void modifyBody(String body) {
+		this.body = body;
+	}
+
+	public void modifyTechs(List<Tech> techs) {
+		this.techs = techs;
+	}
+
+	public void modifyCategory(Category category) {
+		this.category = category;
+	}
+
+	public void modifyState(PostState state) {
+		this.state = state;
+	}
 }
