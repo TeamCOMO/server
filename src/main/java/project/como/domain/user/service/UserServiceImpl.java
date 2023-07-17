@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
 		return response.success("회원가입이 완료되었습니다.");
 	}
 
+
 	@Transactional
 	public ResponseEntity<?> signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUserId(), dto.getPassword());
