@@ -1,4 +1,4 @@
-package project.como.global.auth;
+package project.como.global.auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

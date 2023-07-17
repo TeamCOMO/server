@@ -4,15 +4,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
+import project.como.domain.user.model.User;
 import project.como.domain.user.service.CustomUserDetailsService;
 import project.como.domain.user.service.UserServiceImpl;
-import project.como.global.auth.JwtProvider;
+import project.como.global.auth.model.CurrentUser;
+import project.como.global.auth.service.JwtProvider;
 
 @Slf4j
 @RestController
@@ -35,8 +38,9 @@ public class UserController {
 		return userServiceImpl.signIn(request, dto);
 	}
 
-	@PostMapping("/test")
-	public ResponseEntity<String> test() {
-		return ResponseEntity.ok("success");
+	@GetMapping("/current-test")
+	public ResponseEntity<?> getCurrent(@CurrentUser String username) {
+		User user = userServiceImpl.getUser(username);
+		return ResponseEntity.ok(user);
 	}
 }
