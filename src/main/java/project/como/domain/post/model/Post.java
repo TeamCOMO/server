@@ -70,4 +70,8 @@ public class Post extends BaseTimeEntity {
 	public void modifyState(PostState state) {
 		this.state = state;
 	}
+
+	public void countRead() {
+		++this.readCount;
+	}
 }

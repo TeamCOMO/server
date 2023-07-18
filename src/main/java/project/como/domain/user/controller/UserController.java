@@ -30,17 +30,20 @@ public class UserController {
 	public ResponseEntity<String> signUp(@RequestBody MemberSignupRequestDto dto) throws Exception {
 		userServiceImpl.signUp(dto);
 
-		return ResponseEntity.ok("success");
+		return ResponseEntity.ok().body("success");
 	}
 
 	@PostMapping("/sign-in")
 	public ResponseEntity<?> signIn(HttpServletRequest request, @RequestBody MemberLoginRequestDto dto) {
-		return userServiceImpl.signIn(request, dto);
+		String accessToken = userServiceImpl.signIn(request, dto);
+
+		return ResponseEntity.ok().body(accessToken);
 	}
 
 	@GetMapping("/current-test")
 	public ResponseEntity<?> getCurrent(@CurrentUser String username) {
 		User user = userServiceImpl.getUser(username);
-		return ResponseEntity.ok(user);
+
+		return ResponseEntity.ok().body(user);
 	}
 }
