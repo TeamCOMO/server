@@ -8,6 +8,6 @@ import project.como.global.auth.model.CurrentUser;
 
 public interface UserService {
 
-	ResponseEntity<?> signIn(HttpServletRequest request, MemberLoginRequestDto dto);
-	public ResponseEntity<?> signUp(MemberSignupRequestDto dto) throws Exception;
+	String signIn(HttpServletRequest request, MemberLoginRequestDto dto);
+	void signUp(MemberSignupRequestDto dto) throws Exception;
 }
