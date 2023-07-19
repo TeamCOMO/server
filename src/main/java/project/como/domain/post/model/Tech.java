@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum Stack {
+public enum Tech {
 	JavaScript("JavaScript"),
 	TypeScript("TypeScript"),
 	React("React"),
