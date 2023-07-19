@@ -23,6 +23,8 @@ import project.como.global.auth.repository.RefreshTokenRedisRepository;
 import project.como.global.common.dto.ApiResponse;
 import project.como.global.common.model.Helper;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
 	private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
 	@Transactional
-	public ResponseEntity<?> signUp(MemberSignupRequestDto dto) throws Exception {
+	public void signUp(MemberSignupRequestDto dto) throws Exception {
 		if (userRepository.findByUsername(dto.getUsername()).isPresent())
 			throw new Exception("이미 존재하는 아이디입니다.");
 
@@ -46,13 +48,11 @@ public class UserServiceImpl implements UserService {
 
 		User user = userRepository.save(dto.toEntity());
 		user.encodePassword(passwordEncoder);
-
-		return response.success("회원가입이 완료되었습니다.");
 	}
 
 
 	@Transactional
-	public ResponseEntity<?> signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
+	public String signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
 
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 				.refreshToken(tokenInfo.getRefreshToken())
 				.build());
 
-		return response.success(tokenInfo.getAccessToken());
+		return tokenInfo.getAccessToken();
 	}
 
 	@Transactional
