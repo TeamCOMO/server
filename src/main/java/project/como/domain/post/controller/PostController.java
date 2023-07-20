@@ -46,7 +46,7 @@ public class PostController {
 		return ResponseEntity.ok().body(dto);
 	}
 
-	@PutMapping("/post/modify")
+	@PatchMapping("/post/modify")
 	public ResponseEntity<String> modifyPost(@CurrentUser String username, @RequestBody PostModifyRequestDto dto) {
 		postService.modifyPost(username, dto);
 
