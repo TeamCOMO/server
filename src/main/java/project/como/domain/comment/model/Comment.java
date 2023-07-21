@@ -3,13 +3,9 @@ package project.como.domain.comment.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import project.como.domain.comment.dto.CommentUpdateDto;
-import project.como.domain.comment.reposiory.CommentRepository;
 import project.como.domain.post.model.Post;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
-
-import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor

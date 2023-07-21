@@ -1,18 +1,15 @@
 package project.como.domain.comment.service;
 
 import project.como.domain.comment.dto.CommentCreateRequestDto;
-import project.como.domain.comment.dto.CommentDto;
-import project.como.domain.comment.dto.CommentUpdateDto;
-import project.como.domain.comment.model.Comment;
-
-import java.util.List;
+import project.como.domain.comment.dto.CommentDetailDto;
+import project.como.domain.comment.dto.CommentResponseDto;
 
 public interface CommentService {
     public void writeComment(String userId, Long postId, CommentCreateRequestDto dto); //댓글 생성
-    public CommentDto updateComment(Long commentId, CommentUpdateDto dto) ; // 댓글 수정
-    public List<CommentDto> findComments(Long postId); // 게시물에 작성한 모든 댓글
+    public void updateComment(String username, Long commentId, CommentDetailDto dto) ; // 댓글 수정
+    public CommentResponseDto findComments(Long postId); // 게시물에 작성한 모든 댓글
 
-    public CommentDto findComment(Long commentId);
+    public CommentDetailDto findComment(Long commentId);
 
     public void deleteComment(Long commentId) ; // 댓글 삭제
 
