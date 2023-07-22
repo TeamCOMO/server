@@ -7,9 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import project.como.domain.comment.model.Comment;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -73,5 +75,16 @@ public class Post extends BaseTimeEntity {
 
 	public void countRead() {
 		++this.readCount;
+	}
+
+	@OneToMany(mappedBy = "post")
+	private Collection<Comment> comment;
+
+	public Collection<Comment> getComment() {
+		return comment;
+	}
+
+	public void setComment(Collection<Comment> comment) {
+		this.comment = comment;
 	}
 }
