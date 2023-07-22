@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
 		user.encodePassword(passwordEncoder);
 	}
 
+
 	@Transactional
 	public String signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());

@@ -62,7 +62,8 @@ public interface ErrorType {
 	enum NotFound implements ErrorType {
 		NOT_FOUND_DEFAULT(4000),
 		POST_NOT_FOUND(4001),
-		USER_NOT_FOUND(4002)
+		USER_NOT_FOUND(4002),
+		COMMENT_NOT_FOUND(4003)
 		;
 
 		private final int errorCode;
