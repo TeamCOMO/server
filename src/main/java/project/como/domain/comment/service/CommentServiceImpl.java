@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
+import project.como.domain.comment.exception.CommentNotFoundException;
 import project.como.domain.comment.model.Comment;
-import project.como.domain.comment.reposiory.CommentRepository;
+import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.post.exception.PostNotFoundException;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.repository.PostRepository;
+import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CommentServiceImp implements CommentService
+public class CommentServiceImpl implements CommentService
 {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -31,8 +33,7 @@ public class CommentServiceImp implements CommentService
     @Transactional
     @Override
     public void writeComment(String username, Long postId, CommentCreateRequestDto dto) {
-        User findUser = userRepository.findByUsername(username).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 유저입니다."));
+        User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(() ->
                 new PostNotFoundException(postId));
 
@@ -43,7 +44,7 @@ public class CommentServiceImp implements CommentService
     @Override
     public CommentDetailDto findComment(Long commentId) {
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                new CommentNotFoundException(commentId));
 
         return CommentDetailDto.builder()
                 .body(findComment.getBody())
@@ -56,19 +57,18 @@ public class CommentServiceImp implements CommentService
 
         return  CommentResponseDto.builder()
                 .comments(comments
-                            .stream()
-                            .map(c -> new CommentDetailDto(c))
-                            .collect(Collectors.toList()))
-                            .build();
+                        .stream()
+                        .map(CommentDetailDto::new)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     @Transactional
     @Override
     public void updateComment(String username, Long commentId, CommentDetailDto dto)  {
-        userRepository.findByUsername(username).orElseThrow(()->
-                new IllegalArgumentException("존재하지 않는 유저입니다"));
+        userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                new CommentNotFoundException(commentId));
 
         findComment.updateBody(dto.getBody());
     }
@@ -77,7 +77,7 @@ public class CommentServiceImp implements CommentService
     @Override
     public void deleteComment(Long commentId) {
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                new CommentNotFoundException(commentId));
 
         commentRepository.delete(findComment);
     }
