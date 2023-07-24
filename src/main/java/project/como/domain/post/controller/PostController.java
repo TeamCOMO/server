@@ -1,5 +1,6 @@
 package project.como.domain.post.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public class PostController {
 	private final PostService postService;
 
 	@PostMapping("/post/create")
-	public ResponseEntity<String> createPost(@CurrentUser String username, @RequestBody PostCreateRequestDto dto) {
+	public ResponseEntity<String> createPost(@CurrentUser String username, @RequestBody @Valid PostCreateRequestDto dto) {
 		postService.createPost(username, dto);
 
 		return ResponseEntity.ok().body("success");
