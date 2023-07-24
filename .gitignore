@@ -1,5 +1,6 @@
 HELP.md
 .gradle
+.DS_Store
 gradle
 build/
 src/main/generated/
