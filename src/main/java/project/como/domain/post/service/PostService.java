@@ -16,6 +16,7 @@ import project.como.domain.post.exception.PostAccessDeniedException;
 import project.como.domain.post.exception.PostNotFoundException;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
+import project.como.domain.post.model.PostState;
 import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
@@ -37,7 +38,7 @@ public class PostService {
 				.title(dto.getTitle())
 				.body(dto.getBody())
 				.category(dto.getCategory())
-				.state(dto.getState())
+				.state(PostState.Active)
 				.techs(dto.getTechs())
 				.user(user)
 				.build();
