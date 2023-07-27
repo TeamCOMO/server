@@ -1,9 +1,11 @@
 package project.como.domain.interest.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
+import project.como.domain.interest.dto.InterestDetailDto;
 import project.como.domain.interest.dto.InterestResponseDto;
 import project.como.domain.interest.model.Interest;
 import project.como.domain.interest.repository.InterestRepository;
@@ -30,12 +32,11 @@ public class InterestService {
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
         Post findPost = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 
+        if (isInterestAlreadyRegistered(findUser, findPost)) {
+            throw new IllegalStateException("이미 관심 등록한 게시물입니다.");
+        }
         Interest interest = dto.toEntity(findUser, findPost);
         interestRepository.save(interest);
-        /**
-         * 게시물에 관한 관심 등록 기능이므로 게시물에 의존적으로 보임.
-         * dto가 파라미터로 필요가 없지만 toEntity를 위해 사용함.
-         */
     }
 
     public InterestResponseDto findInterests(String username){
@@ -44,7 +45,7 @@ public class InterestService {
 
         return InterestResponseDto.builder()
                 .interests(interests.stream()
-                        .map(i -> InterestCreateRequestDto.builder().postId(i.getPost().getId()).build())
+                        .map(i -> InterestDetailDto.builder().postId(i.getPost().getId()).build())
                         .collect(Collectors.toList()))
                 .build();
     }
@@ -56,6 +57,12 @@ public class InterestService {
 
         interestRepository.delete(findInterest);
     }
+
+    // 해당 유저가 이미 해당 게시물에 관심 등록을 했는지 체크
+    private boolean isInterestAlreadyRegistered(User user, Post post) {
+        return interestRepository.existsByUserAndPost(user, post);
+    }
+
 
 
 
