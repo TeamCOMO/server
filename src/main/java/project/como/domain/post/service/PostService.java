@@ -3,6 +3,7 @@ package project.como.domain.post.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -118,7 +120,10 @@ public class PostService {
 	public PostsResponseDto getInterestPostsByUser(Pageable pageable, int pageNo, String username){
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 		List<Interest> interests = interestRepository.findAllbyUser(user);
-		Page<Post> postPage = postRepository.findInterestPosts(interests, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		//Page<Post> postPage = postRepository.findInterestPosts(interests, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		List<Post> posts = interests.stream().map(i -> i.getPost()).collect(Collectors.toList());
+		Page<Post> postPage = new PageImpl<>(posts, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), posts.size());
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())

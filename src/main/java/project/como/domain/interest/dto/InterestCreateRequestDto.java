@@ -15,7 +15,6 @@ import project.como.domain.user.model.User;
 public class InterestCreateRequestDto {
 
     private Long postId;
-    //private String body;
 
     public Interest toEntity(User user, Post post){
         return Interest.builder()
@@ -24,6 +23,3 @@ public class InterestCreateRequestDto {
                 .build();
     }
 }
-/**
- * 필드가 가진 값
- */
