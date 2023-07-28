@@ -2,11 +2,16 @@ package project.como.domain.interest.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
-import project.como.domain.interest.dto.InterestDetailDto;
+import project.como.domain.interest.dto.InterestDetailResponseDto;
 import project.como.domain.interest.dto.InterestResponseDto;
+import project.como.domain.interest.exception.InterestNotFoundException;
 import project.como.domain.interest.model.Interest;
 import project.como.domain.interest.repository.InterestRepository;
 import project.como.domain.post.exception.PostNotFoundException;
@@ -20,9 +25,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InterestService {
+    private final int TOTAL_ITEMS_PER_PAGE = 20;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final InterestRepository interestRepository;
@@ -39,20 +46,30 @@ public class InterestService {
         interestRepository.save(interest);
     }
 
-    public InterestResponseDto findInterests(String username){
+    public InterestResponseDto findInterests(String username, int pageNo, Pageable pageable){
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
-        List<Interest> interests = interestRepository.findAllbyUser(findUser);
+        List<Interest> interests = interestRepository.findAllByUser(findUser);
+        Page<Interest> interestPostPage = new PageImpl<>(interests, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
 
         return InterestResponseDto.builder()
-                .interests(interests.stream()
-                        .map(i -> InterestDetailDto.builder().postId(i.getPost().getId()).build())
+                .totalPages(interestPostPage.getTotalPages())
+                .totalElements(interestPostPage.getTotalElements())
+                .currentPage(pageNo)
+                .interests(interestPostPage.getContent().stream()
+                        .map(i -> InterestDetailResponseDto.builder()
+                                .title(i.getPost().getTitle())
+                                .body(i.getPost().getBody())
+                                .category(i.getPost().getCategory())
+                                .state(i.getPost().getState())
+                                .techs(i.getPost().getTechs())
+                                .build())
                         .collect(Collectors.toList()))
                 .build();
     }
     @Transactional
     public void deleteInterest(Long interestId, String username){
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
-        Interest findInterest = interestRepository.findById(interestId).orElseThrow(() -> new IllegalArgumentException("관심 삭제 실패"));
+        Interest findInterest = interestRepository.findById(interestId).orElseThrow(() -> new InterestNotFoundException(interestId));
         // interest에 대한 예외 처리로 변경 필요
 
         interestRepository.delete(findInterest);
@@ -62,8 +79,5 @@ public class InterestService {
     private boolean isInterestAlreadyRegistered(User user, Post post) {
         return interestRepository.existsByUserAndPost(user, post);
     }
-
-
-
 
 }

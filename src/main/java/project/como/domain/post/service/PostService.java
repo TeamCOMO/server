@@ -117,7 +117,7 @@ public class PostService {
 	}
 
 
-	public PostsResponseDto getInterestPostsByUser(Pageable pageable, int pageNo, String username){
+	/*public PostsResponseDto getInterestPostsByUser(Pageable pageable, int pageNo, String username){
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 		List<Interest> interests = interestRepository.findAllbyUser(user);
 
@@ -137,5 +137,5 @@ public class PostService {
 						.techs(post.getTechs())
 						.build()).toList()
 				).build();
-	}
+	}*/
 }

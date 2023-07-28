@@ -47,16 +47,6 @@ public class PostController {
 		return ResponseEntity.ok().body(dto);
 	}
 
-	@GetMapping("/posts/interest")
-	public ResponseEntity<PostsResponseDto> getInterestPostsByUser(@CurrentUser String username,
-				@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
-			Pageable pageable ){
-		pageNo = (pageNo == 0) ? 0 : (pageNo - 1); //실제로 처리될 때는 시작 번호가 0이므로 클라이언트에서 받은 pageNo에서 1을 빼줌
-		PostsResponseDto dto = postService.getInterestPostsByUser(pageable, pageNo, username);
-
-		return ResponseEntity.ok().body(dto);
-	}
-
 	@PatchMapping("/post/modify")
 	public ResponseEntity<String> modifyPost(@CurrentUser String username, @RequestBody PostModifyRequestDto dto) {
 		postService.modifyPost(username, dto);
