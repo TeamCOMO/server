@@ -17,10 +17,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Page<Post> findAllByOrderByCreatedDateDesc(Pageable pageable);
 	Page<Post> findAllByCategoryOrderByCreatedDate(Category category, Pageable pageable);
 	Page<Post> findAllByCategoryAndStateOrderByCreatedDate(Category category, PostState state, Pageable pageable);
-/*
-	@Query("select p from Interest i join i.post p where i in :interests") // 사용 가능하지만 N+1 문제가 발생함.
-	Page<Post> findInterestPosts(@Param("interests") List<Interest> interestList, Pageable pageable);
-*/
 
 }
 
