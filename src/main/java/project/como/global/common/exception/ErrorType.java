@@ -63,7 +63,8 @@ public interface ErrorType {
 		NOT_FOUND_DEFAULT(4000),
 		POST_NOT_FOUND(4001),
 		USER_NOT_FOUND(4002),
-		COMMENT_NOT_FOUND(4003)
+		COMMENT_NOT_FOUND(4003),
+		INTEREST_NOT_FOUND(4004)
 		;
 
 		private final int errorCode;
