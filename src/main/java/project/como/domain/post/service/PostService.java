@@ -7,6 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.como.domain.post.exception.HeartConflictException;
+import project.como.domain.post.exception.HeartNotFoundException;
+import project.como.domain.post.model.Heart;
+import project.como.domain.post.repository.HeartRepository;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
@@ -17,11 +21,12 @@ import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.PostState;
 import project.como.domain.post.repository.PostRepository;
+import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,6 +37,7 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
+	private final HeartRepository heartRepository;
 
 	public void createPost(String username, PostCreateRequestDto dto) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
@@ -43,6 +49,8 @@ public class PostService {
 				.state(PostState.Active)
 				.techs(dto.getTechs())
 				.user(user)
+				.readCount(0L)
+				.heartCount(0L)
 				.build();
 
 		postRepository.save(newPost);
@@ -110,6 +118,34 @@ public class PostService {
 						.techs(post.getTechs())
 						.build()).toList())
 				.build();
+	}
+
+	@Transactional
+	public void makeHeart(String username, Long postId) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+		if (heartRepository.findByPostAndUser(post, user).isPresent())
+			throw new HeartConflictException();
+
+		Heart heart = Heart.builder()
+				.user(user)
+				.post(post)
+				.build();
+
+		heartRepository.save(heart);
+		post.countHeart();
+	}
+
+	@Transactional
+	public void deleteHeart(String username, Long postId) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+		Heart heart = heartRepository.findByPostAndUser(post, user).orElseThrow(HeartNotFoundException::new);
+
+		heartRepository.delete(heart);
+		post.discountHeart();
 	}
 
 }
