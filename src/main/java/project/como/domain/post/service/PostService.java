@@ -128,6 +128,7 @@ public class PostService {
 				.build();
 
 		heartRepository.save(heart);
+		post.countHeart();
 	}
 
 	public void deleteHeart(String username, Long postId) {
@@ -137,5 +138,6 @@ public class PostService {
 		Heart heart = heartRepository.findByPostAndUser(post, user).orElseThrow(HeartNotFoundException::new);
 
 		heartRepository.delete(heart);
+		post.discountHeart();
 	}
 }

@@ -53,6 +53,10 @@ public class Post extends BaseTimeEntity {
 	@Generated(GenerationTime.ALWAYS)
 	private Long readCount;
 
+	@ColumnDefault("0")
+	@Generated(GenerationTime.ALWAYS)
+	private Long heartCount;
+
 	public void modifyTitle(String title) {
 		this.title = title;
 	}
@@ -76,6 +80,9 @@ public class Post extends BaseTimeEntity {
 	public void countRead() {
 		++this.readCount;
 	}
+
+	public void countHeart() { ++this.heartCount; }
+	public void discountHeart() { --this.heartCount; }
 
 	@OneToMany(mappedBy = "post")
 	private Collection<Comment> comment;
