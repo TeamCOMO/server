@@ -49,12 +49,8 @@ public class Post extends BaseTimeEntity {
 	@NotBlank
 	private String body;
 
-	@ColumnDefault("0")
-	@Generated(GenerationTime.ALWAYS)
 	private Long readCount;
 
-	@ColumnDefault("0")
-	@Generated(GenerationTime.ALWAYS)
 	private Long heartCount;
 
 	public void modifyTitle(String title) {
