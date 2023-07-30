@@ -24,7 +24,8 @@ import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Slf4j
@@ -146,4 +147,5 @@ public class PostService {
 		heartRepository.delete(heart);
 		post.discountHeart();
 	}
+
 }
