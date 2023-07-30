@@ -16,7 +16,7 @@ import static jakarta.persistence.GenerationType.*;
 public class Heart {
 
 	@GeneratedValue(strategy = IDENTITY)
-	@Id @Column(name = "likey_id")
+	@Id @Column(name = "heart_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
