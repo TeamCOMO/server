@@ -38,7 +38,7 @@ public class SecurityConfig {
 				.csrf().disable()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
-				.authorizeHttpRequests()
+				. authorizeHttpRequests()
 				.requestMatchers(new AntPathRequestMatcher("/oauth2/**")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/user/sign-up")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/user/sign-in")).permitAll()

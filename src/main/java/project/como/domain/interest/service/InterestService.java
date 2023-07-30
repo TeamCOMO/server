@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
 import project.como.domain.interest.dto.InterestDetailResponseDto;
 import project.como.domain.interest.dto.InterestResponseDto;
+import project.como.domain.interest.exception.AlreadyInterestException;
 import project.como.domain.interest.exception.InterestNotFoundException;
 import project.como.domain.interest.model.Interest;
 import project.como.domain.interest.repository.InterestRepository;
@@ -40,7 +41,7 @@ public class InterestService {
         Post findPost = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 
         if (isInterestAlreadyRegistered(findUser, findPost)) {
-            throw new IllegalStateException("이미 관심 등록한 게시물입니다.");
+            throw new AlreadyInterestException(findUser.getId(), findPost.getId());
         }
         Interest interest = dto.toEntity(findUser, findPost);
         interestRepository.save(interest);
