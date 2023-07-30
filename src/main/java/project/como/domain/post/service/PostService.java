@@ -25,6 +25,8 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -46,6 +48,8 @@ public class PostService {
 				.state(PostState.Active)
 				.techs(dto.getTechs())
 				.user(user)
+				.readCount(0L)
+				.heartCount(0L)
 				.build();
 
 		postRepository.save(newPost);
@@ -115,6 +119,7 @@ public class PostService {
 				.build();
 	}
 
+	@Transactional
 	public void makeHeart(String username, Long postId) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
@@ -131,6 +136,7 @@ public class PostService {
 		post.countHeart();
 	}
 
+	@Transactional
 	public void deleteHeart(String username, Long postId) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
