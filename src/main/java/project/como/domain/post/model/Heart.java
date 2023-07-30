@@ -1,4 +1,4 @@
-package project.como.domain.heart.model;
+package project.como.domain.post.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

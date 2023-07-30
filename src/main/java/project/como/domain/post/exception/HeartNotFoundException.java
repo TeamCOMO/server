@@ -1,4 +1,4 @@
-package project.como.domain.heart.exception;
+package project.como.domain.post.exception;
 
 import project.como.global.common.exception.ComoException;
 import project.como.global.common.exception.ErrorType;
