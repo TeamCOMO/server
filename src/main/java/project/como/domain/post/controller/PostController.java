@@ -60,4 +60,18 @@ public class PostController {
 
 		return ResponseEntity.ok().body("success");
 	}
+
+	@PostMapping("/post/heart/{post_id}")
+	public ResponseEntity<String> makeHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
+		postService.makeHeart(username, postId);
+
+		return ResponseEntity.ok().body("success");
+	}
+
+	@DeleteMapping("/post/heart/delete/{post_id}")
+	public ResponseEntity<String> deleteHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
+		postService.deleteHeart(username, postId);
+
+		return ResponseEntity.ok().body("success");
+	}
 }
