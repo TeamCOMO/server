@@ -1,5 +1,6 @@
 package project.como.domain.post.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import project.como.domain.post.model.Post;
