@@ -3,13 +3,10 @@ package project.como.domain.post.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.como.domain.interest.model.Interest;
-import project.como.domain.interest.repository.InterestRepository;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
@@ -35,7 +32,6 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
-	private final InterestRepository interestRepository;
 
 	public void createPost(String username, PostCreateRequestDto dto) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
@@ -116,26 +112,4 @@ public class PostService {
 				.build();
 	}
 
-
-	/*public PostsResponseDto getInterestPostsByUser(Pageable pageable, int pageNo, String username){
-		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-		List<Interest> interests = interestRepository.findAllbyUser(user);
-
-		//Page<Post> postPage = postRepository.findInterestPosts(interests, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
-		List<Post> posts = interests.stream().map(i -> i.getPost()).collect(Collectors.toList());
-		Page<Post> postPage = new PageImpl<>(posts, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), posts.size());
-
-		return PostsResponseDto.builder()
-				.totalPages(postPage.getTotalPages())
-				.totalElements(postPage.getTotalElements())
-				.currentPage(postPage.getNumber())
-				.posts(postPage.getContent().stream().map(post -> PostDetailResponseDto.builder()
-						.title(post.getTitle())
-						.body(post.getBody())
-						.category(post.getCategory())
-						.state(post.getState())
-						.techs(post.getTechs())
-						.build()).toList()
-				).build();
-	}*/
 }
