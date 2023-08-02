@@ -1,13 +1,10 @@
 package project.como.domain.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
@@ -45,5 +42,10 @@ public class UserController {
 		User user = userServiceImpl.getUser(username);
 
 		return ResponseEntity.ok().body(user);
+	}
+
+	@GetMapping("/ping")
+	public ResponseEntity<String> ping() {
+		return ResponseEntity.ok().body("pong");
 	}
 }
