@@ -10,4 +10,6 @@ public interface UserService {
 
 	String signIn(HttpServletRequest request, MemberLoginRequestDto dto);
 	void signUp(MemberSignupRequestDto dto) throws Exception;
+
+	boolean checkDuplicate(String username);
 }
