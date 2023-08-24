@@ -41,7 +41,7 @@ public class UserController {
 		return ResponseEntity.ok().body(accessToken);
 	}
 
-	@GetMapping("/check-duplicate")
+	@GetMapping("/check-duplicate/{username}")
 	public ResponseEntity<String> checkDuplicate(@PathVariable String username) {
 		boolean check = userServiceImpl.checkDuplicate(username);
 
