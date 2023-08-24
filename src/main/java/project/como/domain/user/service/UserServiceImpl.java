@@ -100,4 +100,8 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 		return user;
 	}
+
+	public boolean checkDuplicate(String username) {
+		return userRepository.findByUsername(username).isPresent();
+	}
 }
