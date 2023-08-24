@@ -24,14 +24,14 @@ public class UserController {
 	private final JwtProvider jwtProvider;
 
 	@PostMapping("/sign-up")
-	public ResponseEntity<String> signUp(@RequestBody MemberSignupRequestDto dto) throws Exception {
+	public ResponseEntity<String> signUp(@Valid @RequestBody MemberSignupRequestDto dto) throws Exception {
 		userServiceImpl.signUp(dto);
 
 		return ResponseEntity.ok().body("success");
 	}
 
 	@GetMapping("/sign-in")
-	public ResponseEntity<?> signIn(HttpServletRequest request, @RequestBody MemberLoginRequestDto dto) {
+	public ResponseEntity<?> signIn(HttpServletRequest request, @Valid @RequestBody MemberLoginRequestDto dto) {
 		String accessToken = userServiceImpl.signIn(request, dto);
 
 		return ResponseEntity.ok().body(accessToken);
