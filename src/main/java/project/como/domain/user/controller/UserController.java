@@ -30,7 +30,7 @@ public class UserController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	@PostMapping("/sign-in")
+	@GetMapping("/sign-in")
 	public ResponseEntity<?> signIn(HttpServletRequest request, @RequestBody MemberLoginRequestDto dto) {
 		String accessToken = userServiceImpl.signIn(request, dto);
 
