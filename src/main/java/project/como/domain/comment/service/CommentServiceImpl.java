@@ -1,5 +1,6 @@
 package project.como.domain.comment.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
+import project.como.domain.comment.exception.CommentForbiddenAccessException;
 import project.como.domain.comment.exception.CommentNotFoundException;
 import project.como.domain.comment.model.Comment;
 import project.como.domain.comment.repository.CommentRepository;
@@ -29,6 +31,7 @@ public class CommentServiceImpl implements CommentService
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final EntityManager em;
 
     @Transactional
     @Override
@@ -65,10 +68,15 @@ public class CommentServiceImpl implements CommentService
 
     @Transactional
     @Override
-    public void updateComment(String username, Long commentId, CommentDetailDto dto)  {
-        userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    public void updateComment(String username, Long commentId, CommentDetailDto dto) throws Exception {
+        em.clear();
+        User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
+
+        if(!checkUser(findUser,findComment)){
+            throw new CommentForbiddenAccessException();
+        }
 
         findComment.updateBody(dto.getBody());
     }
@@ -81,5 +89,17 @@ public class CommentServiceImpl implements CommentService
 
         commentRepository.delete(findComment);
     }
+
+
+    // 댓글 권한 체크 로직 //
+    @Override
+    public boolean checkUser(User user, Comment comment) {
+        //접근하는 사용자가 댓글을 작성한 사용자 맞는지, 게시물 작성한 사용자 맞는지 확인     //쿼리문
+        return user.getId().equals(comment.getUser().getId()) || user.getId().equals(comment.getPost().getUser().getId());
+    }
+
+
+
+
 
 }
