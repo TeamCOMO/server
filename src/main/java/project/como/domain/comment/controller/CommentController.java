@@ -41,7 +41,7 @@ public class CommentController {
     @PatchMapping("/comment/{comment_id}")
     public ResponseEntity<String> updateComment(@CurrentUser String username,
                                                                   @PathVariable("comment_id") Long commentId,
-                                                                  @RequestBody @Valid CommentDetailDto dto){
+                                                                  @RequestBody @Valid CommentDetailDto dto) throws Exception {
         commentService.updateComment(username, commentId, dto);
 
         return ResponseEntity.ok().body("success");
