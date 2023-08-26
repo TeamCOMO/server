@@ -59,8 +59,4 @@ class UserControllerTest {
 		boolean test = userServiceImpl.checkDuplicate("test");
 		assertThat(test).isTrue();
 	}
-
-	@Test
-	void ping() {
-	}
 }
