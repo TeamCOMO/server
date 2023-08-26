@@ -4,6 +4,7 @@ HELP.md
 application.yml
 gradle
 build/
+build/**
 src/main/generated/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
