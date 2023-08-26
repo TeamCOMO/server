@@ -56,6 +56,8 @@ class UserControllerTest {
 
 	@Test
 	void checkDuplicate() {
+		boolean test = userServiceImpl.checkDuplicate("test");
+		assertThat(test).isTrue();
 	}
 
 	@Test
