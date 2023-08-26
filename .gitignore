@@ -3,8 +3,9 @@ HELP.md
 .DS_Store
 src/main/resources/application.yml
 gradle
-build/
+build/**
 src/main/generated/
+src/main/resources/application.yml
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
