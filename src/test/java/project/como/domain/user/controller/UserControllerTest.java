@@ -46,6 +46,12 @@ class UserControllerTest {
 
 	@Test
 	void signIn() {
+		MemberLoginRequestDto dto = new MemberLoginRequestDto("test", "test1234");
+
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("X-Forwarded-For", "1.1.1.1");
+		String token = userServiceImpl.signIn(request, dto);
+		assertThat(token).isNotBlank();
 	}
 
 	@Test

@@ -6,7 +6,7 @@ jwt:
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
 #    url: jdbc:mariadb://como-db.c1tec4agavju.ap-northeast-2.rds.amazonaws.com:3306/como?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
