@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
@@ -16,6 +17,7 @@ import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
+import project.como.domain.post.repository.PostRepository;
 import project.como.domain.post.service.PostService;
 import project.como.domain.user.model.User;
 
@@ -31,11 +33,15 @@ class PostControllerTest {
 	@Autowired
 	PostService postService;
 
+	@Autowired
+	PostRepository postRepository;
+
 	@PersistenceContext
 	EntityManager em;
 
 	@Test
 	@DisplayName("게시글 생성")
+	@Transactional
 	void createPost() {
 		User user = em.find(User.class, 1);
 		PostCreateRequestDto dto = new PostCreateRequestDto();
@@ -73,6 +79,7 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
 	void getPostsByCategory() {
 		final String CATEGORY = "Study";
 		Pageable pageable = PageRequest.of(0, 5);
@@ -84,6 +91,7 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
 	void modifyPost() {
 		final String USERNAME = "test";
 		PostModifyRequestDto dto = new PostModifyRequestDto();
@@ -105,7 +113,18 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
 	void deletePost() {
+		final String USERNAME = "test";
+		final Long POST_ID = 1L;
+
+		int initSize = postRepository.findAll().size();
+
+		postService.deletePost(USERNAME, POST_ID);
+
+		int sizeAfterRemoval = postRepository.findAll().size();
+
+		assertThat(initSize).isEqualTo(sizeAfterRemoval + 1);
 	}
 
 	@Test
