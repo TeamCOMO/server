@@ -39,6 +39,8 @@ class PostControllerTest {
 	@PersistenceContext
 	EntityManager em;
 
+	static final String USERNAME = "test";
+
 	@Test
 	@DisplayName("게시글 생성")
 	@Transactional
@@ -93,7 +95,6 @@ class PostControllerTest {
 	@Test
 	@Transactional
 	void modifyPost() {
-		final String USERNAME = "test";
 		PostModifyRequestDto dto = new PostModifyRequestDto();
 
 		Post findPost = em.find(Post.class, 1);
@@ -115,7 +116,6 @@ class PostControllerTest {
 	@Test
 	@Transactional
 	void deletePost() {
-		final String USERNAME = "test";
 		final Long POST_ID = 1L;
 
 		int initSize = postRepository.findAll().size();
@@ -129,6 +129,17 @@ class PostControllerTest {
 
 	@Test
 	void makeHeart() {
+		final Long POST_ID = 2L;
+
+		Post findPost = em.find(Post.class, 2);
+		Long initCount = findPost.getHeartCount();
+
+		postService.makeHeart(USERNAME, POST_ID);
+
+		Post postAfterHeart = em.find(Post.class, 2);
+		Long CountAfterHeart = postAfterHeart.getHeartCount();
+
+		assertThat(initCount).isEqualTo(CountAfterHeart - 1);
 	}
 
 	@Test
