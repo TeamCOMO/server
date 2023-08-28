@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
+import project.como.domain.post.dto.PostModifyRequestDto;
 import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
@@ -84,6 +85,23 @@ class PostControllerTest {
 
 	@Test
 	void modifyPost() {
+		final String USERNAME = "test";
+		PostModifyRequestDto dto = new PostModifyRequestDto();
+
+		Post findPost = em.find(Post.class, 1);
+		assertThat(findPost.getTitle()).isEqualTo("test title");
+		assertThat(findPost.getBody()).isEqualTo("test body");
+
+		dto.setPostId(1L);
+		dto.setTitle("change test");
+		dto.setBody("change body");
+
+		postService.modifyPost(USERNAME, dto);
+
+		Post changedPost = em.find(Post.class, 1);
+
+		assertThat(changedPost.getTitle()).isEqualTo("change test");
+		assertThat(changedPost.getBody()).isEqualTo("change body");
 	}
 
 	@Test
