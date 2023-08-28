@@ -40,7 +40,7 @@ public class Post extends BaseTimeEntity {
 	private Category category;
 
 	@Column(nullable = false)
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private List<Tech> techs;
 
 	@NotBlank
