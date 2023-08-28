@@ -2,6 +2,7 @@ package project.como.domain.post.controller;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
 import project.como.domain.post.dto.PostsResponseDto;
+import project.como.domain.post.exception.HeartConflictException;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
@@ -27,6 +29,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 class PostControllerTest {
 
@@ -128,6 +131,7 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
 	void makeHeart() {
 		final Long POST_ID = 2L;
 
@@ -143,6 +147,27 @@ class PostControllerTest {
 	}
 
 	@Test
+	void duplicateHeart() {
+		final Long POST_ID = 2L;
+
+		assertThrows(HeartConflictException.class, () -> {
+			postService.makeHeart(USERNAME, POST_ID);
+		});
+	}
+
+	@Test
+	@Transactional
 	void deleteHeart() {
+		final Long POST_ID = 2L;
+
+		postService.makeHeart(USERNAME, POST_ID);
+		Post findPost = em.find(Post.class, POST_ID);
+		Long countBeforeRemoval = findPost.getHeartCount();
+
+		postService.deleteHeart(USERNAME, POST_ID);
+		Post postAfterRemoval = em.find(Post.class, POST_ID);
+		Long countAfterRemoval = postAfterRemoval.getHeartCount() + 1L;
+
+		assertThat(countBeforeRemoval).isEqualTo(countAfterRemoval);
 	}
 }
