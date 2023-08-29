@@ -145,6 +145,19 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
+	@DisplayName("게시물 하트 취소")
 	void deleteHeart() {
+		final Long POST_ID = 2L;
+
+		postService.makeHeart(USERNAME, POST_ID);
+		Post findPost = em.find(Post.class, POST_ID);
+		Long countBeforeRemoval = findPost.getHeartCount();
+
+		postService.deleteHeart(USERNAME, POST_ID);
+		Post postAfterRemoval = em.find(Post.class, POST_ID);
+		Long countAfterRemoval = postAfterRemoval.getHeartCount() + 1L;
+
+		assertThat(countBeforeRemoval).isEqualTo(countAfterRemoval);
 	}
 }
