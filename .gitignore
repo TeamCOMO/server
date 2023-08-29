@@ -4,7 +4,10 @@ HELP.md
 .DS_Store
 application.yml
 gradle
+<<<<<<< HEAD
 build/
+=======
+>>>>>>> feed30a (remove: build files)
 build/**
 src/main/generated/
 !gradle/wrapper/gradle-wrapper.jar
