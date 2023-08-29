@@ -6,9 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
+import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
@@ -69,7 +72,15 @@ class PostControllerTest {
 	}
 
 	@Test
+	@DisplayName("게시물 카테고리별 조회")
 	void getPostsByCategory() {
+		final String CATEGORY = "Study";
+		Pageable pageable = PageRequest.of(0, 5);
+
+		PostsResponseDto dto = postService.getPostsByCategory(pageable, 0, CATEGORY);
+
+		assertThat(dto.getTotalElements()).isEqualTo(3);
+		assertThat(dto.getPosts().get(0).getTitle()).isEqualTo("test title");
 	}
 
 	@Test
