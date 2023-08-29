@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
@@ -23,25 +24,29 @@ public class UserController {
 	private final CustomUserDetailsService customUserDetailsService;
 	private final JwtProvider jwtProvider;
 
+	private static final String NOT_DUPLICATED = "사용 가능한 ID입니다.";
+	private static final String DUPLICATED = "중복된 ID입니다. 다른 ID를 사용해주세요.";
+
 	@PostMapping("/sign-up")
-	public ResponseEntity<String> signUp(@RequestBody MemberSignupRequestDto dto) throws Exception {
+	public ResponseEntity<String> signUp(@Valid @RequestBody MemberSignupRequestDto dto) throws Exception {
 		userServiceImpl.signUp(dto);
 
 		return ResponseEntity.ok().body("success");
 	}
 
-	@PostMapping("/sign-in")
-	public ResponseEntity<?> signIn(HttpServletRequest request, @RequestBody MemberLoginRequestDto dto) {
+	@GetMapping("/sign-in")
+	public ResponseEntity<?> signIn(HttpServletRequest request, @Valid @RequestBody MemberLoginRequestDto dto) {
 		String accessToken = userServiceImpl.signIn(request, dto);
 
 		return ResponseEntity.ok().body(accessToken);
 	}
 
-	@GetMapping("/current-test")
-	public ResponseEntity<?> getCurrent(@CurrentUser String username) {
-		User user = userServiceImpl.getUser(username);
+	@GetMapping("/check-duplicate/{username}")
+	public ResponseEntity<String> checkDuplicate(@PathVariable String username) {
+		boolean check = userServiceImpl.checkDuplicate(username);
 
-		return ResponseEntity.ok().body(user);
+		if (check) return ResponseEntity.status(HttpStatus.CONFLICT).body(DUPLICATED);
+		return ResponseEntity.ok().body(NOT_DUPLICATED);
 	}
 
 	@GetMapping("/ping")
