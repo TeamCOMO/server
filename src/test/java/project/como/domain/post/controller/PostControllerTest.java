@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.post.dto.PostCreateRequestDto;
+import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
@@ -52,7 +53,19 @@ class PostControllerTest {
 	}
 
 	@Test
+	@DisplayName("게시물 단건 조회")
 	void getDetailPost() {
+		final Long POST_ID = 1L;
+
+		Post findPost = em.find(Post.class, POST_ID);
+
+		PostDetailResponseDto servicePostDto = postService.getDetailPost(POST_ID);
+
+		assertThat(findPost.getTitle()).isEqualTo(servicePostDto.getTitle());
+		assertThat(findPost.getBody()).isEqualTo(servicePostDto.getBody());
+		assertThat(findPost.getCategory()).isEqualTo(servicePostDto.getCategory());
+		assertThat(findPost.getTechs()).containsExactly(Tech.Java, Tech.Spring);
+		assertThat(servicePostDto.getTechs()).containsExactly(Tech.Java, Tech.Spring);
 	}
 
 	@Test
