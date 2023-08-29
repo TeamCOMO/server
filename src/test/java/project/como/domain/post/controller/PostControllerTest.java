@@ -16,6 +16,7 @@ import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
+import project.como.domain.post.repository.PostRepository;
 import project.como.domain.post.service.PostService;
 import project.como.domain.user.model.User;
 
@@ -28,6 +29,9 @@ class PostControllerTest {
 
 	@Autowired
 	PostService postService;
+
+	@Autowired
+	PostRepository postRepository;
 
 	@PersistenceContext
 	EntityManager em;
@@ -108,7 +112,19 @@ class PostControllerTest {
 	}
 
 	@Test
+	@Transactional
+	@DisplayName("게시물 삭제")
 	void deletePost() {
+		final String USERNAME = "test";
+		final Long POST_ID = 1L;
+
+		int initSize = postRepository.findAll().size();
+
+		postService.deletePost(USERNAME, POST_ID);
+
+		int sizeAfterRemoval = postRepository.findAll().size();
+
+		assertThat(initSize).isEqualTo(sizeAfterRemoval + 1);
 	}
 
 	@Test
