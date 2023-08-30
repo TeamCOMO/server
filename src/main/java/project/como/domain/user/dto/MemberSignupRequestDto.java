@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import project.como.domain.user.model.User;
 
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.Collections;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class MemberSignupRequestDto {
 
 	@NotBlank(message = "아이디를 입력해주세요.")
