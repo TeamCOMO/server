@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ComoException extends RuntimeException {
+	public static Object ConflictException;
 	int errorCode;
 	ErrorType errorType;
 	String detail;
