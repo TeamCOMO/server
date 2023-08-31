@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import project.como.global.auth.exception.ComoAccessDeniedException;
+import project.como.global.auth.exception.ComoLoginFailureException;
 import project.como.global.auth.exception.UnauthorizedException;
 import project.como.global.common.dto.ErrorResponse;
 
@@ -49,6 +51,7 @@ public class ComoExceptionHandler implements AccessDeniedHandler, Authentication
 		response.setContentType("application/json");
 		response.setCharacterEncoding("utf-8");
 		if (request.getAttribute("error-response") == null) {
+
 			response.getWriter().write(gson.toJson(status == SC_FORBIDDEN ? accessDenied : unauthorized));
 		} else {
 			response.getWriter().write(gson.toJson(request.getAttribute("error-response")));
@@ -58,7 +61,12 @@ public class ComoExceptionHandler implements AccessDeniedHandler, Authentication
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-		prepareResponse(request, response, SC_FORBIDDEN);
+		if (authException instanceof BadCredentialsException) {
+			response.getWriter().write(gson.toJson(new ErrorResponse(new ComoLoginFailureException())));
+			response.setStatus(response.getStatus());
+		} else {
+			prepareResponse(request, response, SC_FORBIDDEN);
+		}
 	}
 
 	@Override

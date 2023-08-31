@@ -1,4 +1,4 @@
-package project.como.global.common.aspect;
+package project.como.global.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,10 +8,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import project.como.global.common.model.CustomLog;
@@ -24,13 +23,13 @@ import java.util.Map;
 
 @Slf4j
 @Aspect
-@Component
-public class LoggerAspect {
+@Configuration
+public class LoggerConfig {
 
 	private static final String format = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	@Around("@annotation(project.como.global.common.model.Logging) && @annotation(logging)")
-	public Object aroundLogger(ProceedingJoinPoint joinPoint, Logging logging) throws Exception {
+	public Object aroundLogger(ProceedingJoinPoint joinPoint, Logging logging) throws Throwable {
 		CustomLog customLog = new CustomLog();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 		customLog.setCreatedAt(LocalDateTime.now().format(formatter));
@@ -43,8 +42,7 @@ public class LoggerAspect {
 		try {
 			result = joinPoint.proceed();
 		} catch (Throwable t) {
-			t.printStackTrace();
-			customLog.setResult("fail-" + t.getMessage());
+			throw t;
 		}
 
 		if (result instanceof ResponseEntity) {
