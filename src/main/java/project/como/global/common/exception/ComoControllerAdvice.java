@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import project.como.domain.post.exception.HeartConflictException;
+import project.como.domain.post.exception.HeartNotFoundException;
 import project.como.domain.post.exception.PostAccessDeniedException;
 import project.como.domain.post.exception.PostNotFoundException;
 import project.como.global.auth.exception.ComoLoginFailureException;
@@ -36,5 +37,10 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(value = HeartConflictException.class)
 	public ResponseEntity<ErrorResponse> handleHeartConflictException(HeartConflictException ex) {
 		return ResponseEntity.status(CONFLICT).body(new ErrorResponse(new HeartConflictException()));
+	}
+
+	@ExceptionHandler(value = HeartNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleHeartNotFoundException(HeartNotFoundException ex) {
+		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new HeartNotFoundException()));
 	}
 }
