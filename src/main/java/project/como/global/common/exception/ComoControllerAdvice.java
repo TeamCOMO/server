@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import project.como.domain.post.exception.HeartConflictException;
 import project.como.domain.post.exception.PostAccessDeniedException;
 import project.como.domain.post.exception.PostNotFoundException;
 import project.como.global.auth.exception.ComoLoginFailureException;
@@ -30,5 +31,10 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(value = PostAccessDeniedException.class)
 	public ResponseEntity<ErrorResponse> handlePostAccessDeniedException(PostAccessDeniedException ex) {
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(new PostAccessDeniedException()));
+	}
+
+	@ExceptionHandler(value = HeartConflictException.class)
+	public ResponseEntity<ErrorResponse> handleHeartConflictException(HeartConflictException ex) {
+		return ResponseEntity.status(CONFLICT).body(new ErrorResponse(new HeartConflictException()));
 	}
 }
