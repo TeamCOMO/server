@@ -43,26 +43,27 @@ public class LoggerConfig {
 			result = joinPoint.proceed();
 		} catch (Throwable t) {
 			throw t;
-		}
+		} finally {
+			if (result instanceof ResponseEntity) {
+				ResponseEntity responseEntity = (ResponseEntity) result;
 
-		if (result instanceof ResponseEntity) {
-			ResponseEntity responseEntity = (ResponseEntity) result;
-
-			if (responseEntity.getStatusCode() == HttpStatus.OK)
-				customLog.setResult("success");
-			else {
-				HttpStatus status = HttpStatus.valueOf(responseEntity.getStatusCode().value());
-				customLog.setResult("fail-" + status.getReasonPhrase());
+				if (responseEntity.getStatusCode() == HttpStatus.OK)
+					customLog.setResult("success");
+				else {
+					HttpStatus status = HttpStatus.valueOf(responseEntity.getStatusCode().value());
+					customLog.setResult("fail-" + status.getReasonPhrase());
+				}
 			}
+
+			if (result == null) customLog.setResult("fail");
+
+			MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+			customLog.setMethod(methodSignature.getName());
+			customLog.setItem(logging.item());
+			customLog.setAction(logging.action());
+
+			log.info(getMessage(customLog));
 		}
-
-		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-		customLog.setMethod(methodSignature.getName());
-		customLog.setItem(logging.item());
-		customLog.setAction(logging.action());
-
-		log.info(getMessage(customLog));
-
 		return result;
 	}
 
