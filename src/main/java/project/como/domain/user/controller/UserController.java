@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
@@ -37,7 +39,7 @@ public class UserController {
 	}
 
 	@Logging(item = "User", action = "get")
-	@GetMapping("/sign-in")
+	@PostMapping("/sign-in")
 	public ResponseEntity<?> signIn(HttpServletRequest request, @Valid @RequestBody MemberLoginRequestDto dto) {
 		String accessToken = userServiceImpl.signIn(request, dto);
 
