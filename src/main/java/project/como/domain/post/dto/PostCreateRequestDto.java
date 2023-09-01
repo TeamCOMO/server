@@ -11,12 +11,12 @@ import java.util.List;
 
 @Data
 public class PostCreateRequestDto {
-	@NotBlank
+	@NotBlank(message = "제목을 입력해주세요.")
 	private String title;
-	@NotBlank
+	@NotBlank(message = "본문을 입력해주세요.")
 	private String body;
-	@NotNull
+	@NotNull(message = "카테고리를 선택해주세요.")
 	private Category category;
-	@NotNull
+	@NotNull(message = "기술스택을 선택해주세요.")
 	private List<Tech> techs;
 }
