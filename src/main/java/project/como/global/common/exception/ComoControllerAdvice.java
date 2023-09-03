@@ -6,11 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import project.como.domain.post.exception.HeartConflictException;
-import project.como.domain.post.exception.HeartNotFoundException;
-import project.como.domain.post.exception.PostAccessDeniedException;
-import project.como.domain.post.exception.PostNotFoundException;
+import project.como.domain.post.exception.*;
 import project.como.domain.user.exception.UserInfoNotFoundException;
+import project.como.domain.user.exception.UserNotEligibleForApplyException;
 import project.como.global.auth.exception.ComoLoginFailureException;
 import project.como.global.common.dto.ErrorResponse;
 
@@ -39,6 +37,16 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(value = PostAccessDeniedException.class)
 	public ResponseEntity<ErrorResponse> handlePostAccessDeniedException(PostAccessDeniedException ex) {
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(new PostAccessDeniedException()));
+	}
+
+	@ExceptionHandler(value = UserNotEligibleForApplyException.class)
+	public ResponseEntity<ErrorResponse> handleUserNotEligibleForApplyException(UserNotEligibleForApplyException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new UserNotEligibleForApplyException()));
+	}
+
+	@ExceptionHandler(value = PostInactiveException.class)
+	public ResponseEntity<ErrorResponse> handlePostInactiveException(PostInactiveException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new PostInactiveException()));
 	}
 
 	@ExceptionHandler(value = HeartConflictException.class)

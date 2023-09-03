@@ -11,7 +11,9 @@ public interface ErrorType {
 		INVALID_DTO_PARAMETER(4),
 
 		SCRAP_MY_POST(102),
-		HEART_MY_POST(103)
+		HEART_MY_POST(103),
+		INACTIVE_POST(104),
+		NOT_ELIGIBLE_FOR_APPLICATION(105)
 		;
 
 		private final int errorCode;
