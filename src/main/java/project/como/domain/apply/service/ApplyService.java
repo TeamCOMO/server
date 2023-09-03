@@ -14,6 +14,8 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -36,5 +38,12 @@ public class ApplyService {
 				.build();
 
 		applyRepository.save(application);
+	}
+
+	public boolean getApply(String username, Long postId) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+		return applyRepository.findApplyByUserAndPost(user, post).isPresent();
 	}
 }
