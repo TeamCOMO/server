@@ -11,7 +11,9 @@ public interface ErrorType {
 		INVALID_DTO_PARAMETER(4),
 
 		SCRAP_MY_POST(102),
-		HEART_MY_POST(103)
+		HEART_MY_POST(103),
+		INACTIVE_POST(104),
+		NOT_ELIGIBLE_FOR_APPLICATION(105)
 		;
 
 		private final int errorCode;
@@ -65,10 +67,11 @@ public interface ErrorType {
 		NOT_FOUND_DEFAULT(4000),
 		POST_NOT_FOUND(4001),
 		USER_NOT_FOUND(4002),
-		COMMENT_NOT_FOUND(4003),
+		USER_INFO_NOT_FOUND(4003),
+		COMMENT_NOT_FOUND(4004),
 
 		INTEREST_NOT_FOUND(4005),
-		HEART_NOT_FOUND(4004)
+		HEART_NOT_FOUND(4006)
 		;
 
 		private final int errorCode;
