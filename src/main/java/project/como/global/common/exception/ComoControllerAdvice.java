@@ -39,16 +39,6 @@ public class ComoControllerAdvice {
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(new PostAccessDeniedException()));
 	}
 
-	@ExceptionHandler(value = UserNotEligibleForApplyException.class)
-	public ResponseEntity<ErrorResponse> handleUserNotEligibleForApplyException(UserNotEligibleForApplyException ex) {
-		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new UserNotEligibleForApplyException()));
-	}
-
-	@ExceptionHandler(value = PostInactiveException.class)
-	public ResponseEntity<ErrorResponse> handlePostInactiveException(PostInactiveException ex) {
-		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new PostInactiveException()));
-	}
-
 	@ExceptionHandler(value = HeartConflictException.class)
 	public ResponseEntity<ErrorResponse> handleHeartConflictException(HeartConflictException ex) {
 		return ResponseEntity.status(CONFLICT).body(new ErrorResponse(new HeartConflictException()));
@@ -65,5 +55,15 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(value = UserInfoNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleUserInfoNotFoundException(UserInfoNotFoundException ex) {
 		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new UserInfoNotFoundException()));
+	}
+
+	@ExceptionHandler(value = UserNotEligibleForApplyException.class)
+	public ResponseEntity<ErrorResponse> handleUserNotEligibleForApplyException(UserNotEligibleForApplyException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new UserNotEligibleForApplyException()));
+	}
+
+	@ExceptionHandler(value = PostInactiveException.class)
+	public ResponseEntity<ErrorResponse> handlePostInactiveException(PostInactiveException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new PostInactiveException()));
 	}
 }
