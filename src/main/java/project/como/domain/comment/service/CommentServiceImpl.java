@@ -1,6 +1,5 @@
 package project.como.domain.comment.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,6 @@ public class CommentServiceImpl implements CommentService
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final EntityManager em;
 
     @Transactional
     @Override
@@ -68,34 +66,50 @@ public class CommentServiceImpl implements CommentService
 
     @Transactional
     @Override
-    public void updateComment(String username, Long commentId, CommentDetailDto dto) throws Exception {
-        em.clear();
+    public void updateComment(String username, Long commentId, CommentDetailDto dto) {
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
 
-        if(!checkUser(findUser,findComment)){
+        if(!checkUpdate(findUser,findComment)){
             throw new CommentForbiddenAccessException();
         }
 
         findComment.updateBody(dto.getBody());
     }
+    /**
+     * 댓글 기능 추가
+     * 수정은 댓글 작성자만 가능해야함.
+     * 삭제는 댓글 작성자 혹은 게시물 작성자만 가능해야함.
+     *
+     * 문제는 현재
+     */
 
     @Transactional
     @Override
-    public void deleteComment(Long commentId) {
+    public void deleteComment(String username, Long commentId) {
+        User findUser = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
+
+        if(!checkDelete(findUser, findComment))
+            throw new CommentForbiddenAccessException();
 
         commentRepository.delete(findComment);
     }
 
-
     // 댓글 권한 체크 로직 //
     @Override
-    public boolean checkUser(User user, Comment comment) {
-        //접근하는 사용자가 댓글을 작성한 사용자 맞는지, 게시물 작성한 사용자 맞는지 확인     //쿼리문
-        return user.getId().equals(comment.getUser().getId()) || user.getId().equals(comment.getPost().getUser().getId());
+    public boolean checkUpdate(User user, Comment comment) {
+        //접근하는 사용자가 댓글을 작성한 사용자 맞는지
+        return user.getId().equals(comment.getUser().getId());
+    }
+
+    @Override
+    public boolean checkDelete(User user, Comment comment) {
+        //댓글 작성자만 해당 댓글 삭제 가능 || 게시물 작성자는 모든 댓글을 삭제 가능
+        return checkUpdate(user, comment) || user.getId().equals(comment.getPost().getUser().getId());
+        //위 방법이 최선일까? 쿼리문 호출을 줄일 수 없을까
     }
 
 

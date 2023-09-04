@@ -41,7 +41,7 @@ public class CommentController {
     @PatchMapping("/comment/{comment_id}")
     public ResponseEntity<String> updateComment(@CurrentUser String username,
                                                                   @PathVariable("comment_id") Long commentId,
-                                                                  @RequestBody @Valid CommentDetailDto dto) throws Exception {
+                                                                  @RequestBody @Valid CommentDetailDto dto){
         commentService.updateComment(username, commentId, dto);
 
         return ResponseEntity.ok().body("success");
@@ -49,8 +49,9 @@ public class CommentController {
 
     //게시물 댓글 삭제
     @DeleteMapping("/comment/{comment_id}")
-    public ResponseEntity<String> deleteComment(@PathVariable("comment_id") Long commentId){
-        commentService.deleteComment(commentId);
+    public ResponseEntity<String> deleteComment(@CurrentUser String username,
+                                                @PathVariable("comment_id") Long commentId){
+        commentService.deleteComment(username, commentId);
 
         return ResponseEntity.ok().body("success");
     }

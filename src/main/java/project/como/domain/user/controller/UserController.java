@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
@@ -14,6 +16,7 @@ import project.como.domain.user.service.CustomUserDetailsService;
 import project.como.domain.user.service.UserServiceImpl;
 import project.como.global.auth.model.CurrentUser;
 import project.como.global.auth.service.JwtProvider;
+import project.como.global.common.model.Logging;
 
 @Slf4j
 @RestController
@@ -27,6 +30,7 @@ public class UserController {
 	private static final String NOT_DUPLICATED = "사용 가능한 ID입니다.";
 	private static final String DUPLICATED = "중복된 ID입니다. 다른 ID를 사용해주세요.";
 
+	@Logging(item = "User", action = "post")
 	@PostMapping("/sign-up")
 	public ResponseEntity<String> signUp(@Valid @RequestBody MemberSignupRequestDto dto) throws Exception {
 		userServiceImpl.signUp(dto);
@@ -34,13 +38,15 @@ public class UserController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	@GetMapping("/sign-in")
+	@Logging(item = "User", action = "get")
+	@PostMapping("/sign-in")
 	public ResponseEntity<?> signIn(HttpServletRequest request, @Valid @RequestBody MemberLoginRequestDto dto) {
 		String accessToken = userServiceImpl.signIn(request, dto);
 
 		return ResponseEntity.ok().body(accessToken);
 	}
 
+	@Logging(item = "User", action = "get")
 	@GetMapping("/check-duplicate/{username}")
 	public ResponseEntity<String> checkDuplicate(@PathVariable String username) {
 		boolean check = userServiceImpl.checkDuplicate(username);
@@ -49,6 +55,7 @@ public class UserController {
 		return ResponseEntity.ok().body(NOT_DUPLICATED);
 	}
 
+	@Logging(item = "Ping", action = "get")
 	@GetMapping("/ping")
 	public ResponseEntity<String> ping() {
 		return ResponseEntity.ok().body("pong");
