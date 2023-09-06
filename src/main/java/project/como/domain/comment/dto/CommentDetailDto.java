@@ -4,15 +4,21 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import project.como.domain.comment.model.Comment;
 
+import java.util.List;
+
 @Data @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CommentDetailDto {
+public class  CommentDetailDto {
+
+    private Long id;
 
     private Long parentId;
 
     @NotBlank
     private String body;
+
+    private List<CommentDetailDto> children;
 
 
 }

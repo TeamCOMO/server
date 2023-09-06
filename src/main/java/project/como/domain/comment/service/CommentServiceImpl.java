@@ -1,5 +1,7 @@
 package project.como.domain.comment.service;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,15 +20,14 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CommentServiceImpl implements CommentService
-{
+public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -37,14 +38,16 @@ public class CommentServiceImpl implements CommentService
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
+        Comment findParent = null;
+        if(dto.getParentId() != null)
+            findParent = commentRepository.findById(dto.getParentId()).orElseThrow(() -> new CommentNotFoundException(dto.getParentId()));
 
         Comment comment = Comment.builder()
                 .user(findUser)
                 .post(findPost)
                 .body(dto.getBody())
+                .parent(findParent)
                 .build();
-
-
 
         commentRepository.save(comment);
     }
@@ -62,18 +65,12 @@ public class CommentServiceImpl implements CommentService
     @Override
     public CommentResponseDto findComments(Long postId) {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
+        List<CommentDetailDto> commentDetailList = buildCommentTree(comments, null);
 
-        return  CommentResponseDto.builder()
-                .comments(comments
-                        .stream()
-                        .map(comment -> CommentDetailDto.builder()
-                                .parentId(comment.getParent().getId())
-                                .body(comment.getBody())
-                                .build())
-                        .collect(Collectors.toList()))
+        return CommentResponseDto.builder()
+                .comments(commentDetailList)
                 .build();
     }
-
 
     @Transactional
     @Override
@@ -82,19 +79,12 @@ public class CommentServiceImpl implements CommentService
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
 
-        if(!checkUpdate(findUser,findComment)){
+        if (!checkUpdate(findUser, findComment)) {
             throw new CommentForbiddenAccessException();
         }
 
         findComment.updateBody(dto.getBody());
     }
-    /**
-     * 댓글 기능 추가
-     * 수정은 댓글 작성자만 가능해야함.
-     * 삭제는 댓글 작성자 혹은 게시물 작성자만 가능해야함.
-     *
-     * 문제는 현재
-     */
 
     @Transactional
     @Override
@@ -103,7 +93,7 @@ public class CommentServiceImpl implements CommentService
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
 
-        if(!checkDelete(findUser, findComment))
+        if (!checkDelete(findUser, findComment))
             throw new CommentForbiddenAccessException();
 
         commentRepository.delete(findComment);
@@ -123,8 +113,16 @@ public class CommentServiceImpl implements CommentService
         //위 방법이 최선일까? 쿼리문 호출을 줄일 수 없을까
     }
 
+    public List<CommentDetailDto> buildCommentTree(List<Comment> comments, Comment parent) {
 
-
-
-
+        return comments.stream()
+                .filter(comment -> comment.getParent() == parent)
+                .map(comment -> CommentDetailDto.builder()
+                        .id(comment.getId())
+                        .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
+                        .body(comment.getBody())
+                        .children(buildCommentTree(comments, comment))
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
