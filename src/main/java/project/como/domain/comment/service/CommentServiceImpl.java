@@ -35,10 +35,17 @@ public class CommentServiceImpl implements CommentService
     @Override
     public void writeComment(String username, Long postId, CommentCreateRequestDto dto) {
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-        Post findPost = postRepository.findById(postId).orElseThrow(() ->
-                new PostNotFoundException(postId));
+        Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        Comment comment = dto.toEntity(findUser, findPost);
+
+        Comment comment = Comment.builder()
+                .user(findUser)
+                .post(findPost)
+                .body(dto.getBody())
+                .build();
+
+
+
         commentRepository.save(comment);
     }
 
@@ -59,10 +66,14 @@ public class CommentServiceImpl implements CommentService
         return  CommentResponseDto.builder()
                 .comments(comments
                         .stream()
-                        .map(CommentDetailDto::new)
+                        .map(comment -> CommentDetailDto.builder()
+                                .parentId(comment.getParent().getId())
+                                .body(comment.getBody())
+                                .build())
                         .collect(Collectors.toList()))
                 .build();
     }
+
 
     @Transactional
     @Override

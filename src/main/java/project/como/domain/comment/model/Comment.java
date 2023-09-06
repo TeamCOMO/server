@@ -7,6 +7,9 @@ import project.como.domain.post.model.Post;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @Builder
@@ -30,9 +33,17 @@ public class Comment extends BaseTimeEntity {
 	@NotBlank
 	private String body;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_id")
+	private Comment parent;
+
+	@Builder.Default
+	@OneToMany(mappedBy = "parent", orphanRemoval = true)
+	private List<Comment> children = new ArrayList<>();
+
+
 	public void updateBody (String body){
 		this.body = body;
 	}
-
 
 }
