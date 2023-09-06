@@ -39,8 +39,14 @@ public class CommentServiceImpl implements CommentService {
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         Comment findParent = null;
-        if(dto.getParentId() != null)
+        if(dto.getParentId() != null) {
             findParent = commentRepository.findById(dto.getParentId()).orElseThrow(() -> new CommentNotFoundException(dto.getParentId()));
+
+            int parentLevel = getParentLevel(findParent);
+            if (parentLevel > 3) {
+                throw new IllegalArgumentException("대댓글은 최대 3레벨까지 가능합니다.");
+            }
+        }
 
         Comment comment = Comment.builder()
                 .user(findUser)
@@ -58,6 +64,7 @@ public class CommentServiceImpl implements CommentService {
                 new CommentNotFoundException(commentId));
 
         return CommentDetailDto.builder()
+                .id(findComment.getId())
                 .body(findComment.getBody())
                 .build();
     }
@@ -125,4 +132,16 @@ public class CommentServiceImpl implements CommentService {
                         .build())
                 .collect(Collectors.toList());
     }
+    public int getParentLevel(Comment parentComment) {
+        int level = 1;
+        Comment currentComment = parentComment;
+
+        while (currentComment != null) {
+            level++;
+            currentComment = currentComment.getParent();
+        }
+
+        return level;
+    }
+
 }
