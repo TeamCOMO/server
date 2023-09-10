@@ -6,11 +6,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import project.como.domain.comment.exception.CommentForbiddenAccessException;
+import project.como.domain.comment.exception.CommentLevelExceedException;
+import project.como.domain.comment.exception.CommentNotFoundException;
 import project.como.domain.post.exception.*;
 import project.como.domain.user.exception.UserInfoNotFoundException;
 import project.como.domain.user.exception.UserNotEligibleForApplyException;
 import project.como.global.auth.exception.ComoLoginFailureException;
 import project.como.global.common.dto.ErrorResponse;
+import project.como.global.common.dto.ExceptionResponse;
+
+import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -66,4 +72,27 @@ public class ComoControllerAdvice {
 	public ResponseEntity<ErrorResponse> handlePostInactiveException(PostInactiveException ex) {
 		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new PostInactiveException()));
 	}
+
+	/*
+	Comment Exception
+	*/
+
+	@ExceptionHandler(CommentNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex){
+
+		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse((new CommentNotFoundException() )));
+	}
+	@ExceptionHandler(CommentForbiddenAccessException.class)
+	public ResponseEntity<ErrorResponse> handleCommentForbiddenAccess(CommentForbiddenAccessException ex){
+
+		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse((new CommentForbiddenAccessException())));
+	}
+
+	@ExceptionHandler(CommentLevelExceedException.class)
+	public ResponseEntity<ErrorResponse> handleCommentLevelExceed(CommentLevelExceedException ex){
+
+		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse((new CommentLevelExceedException() )));
+	}
+
+
 }
