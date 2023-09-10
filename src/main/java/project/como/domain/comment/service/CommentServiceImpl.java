@@ -10,6 +10,7 @@ import project.como.domain.comment.dto.CommentCreateRequestDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
+import project.como.domain.comment.exception.CommentLevelExceedException;
 import project.como.domain.comment.exception.CommentNotFoundException;
 import project.como.domain.comment.model.Comment;
 import project.como.domain.comment.repository.CommentRepository;
@@ -44,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
             int parentLevel = getParentLevel(findParent);
             if (parentLevel > 3) {
-                throw new IllegalArgumentException("대댓글은 최대 3레벨까지 가능합니다.");
+                throw new CommentLevelExceedException();
             }
         }
 

@@ -48,7 +48,8 @@ public interface ErrorType {
 	enum Forbidden implements ErrorType {
 		FORBIDDEN_DEFAULT(3000),
 		COMMENT_ACCESS_FORBIDDEN(3001),
-		ACCESS_DENIED(3100),
+		COMMENT_LEVEL_FORBIDDEN(3002),
+		ACCESS_DENIED(3100)
 		;
 
 		private final int errorCode;
