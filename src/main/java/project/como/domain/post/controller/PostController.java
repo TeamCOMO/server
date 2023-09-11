@@ -42,8 +42,8 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "get")
-	@GetMapping("/posts/{category}")
-	public ResponseEntity<PostsResponseDto> getPostsByCategory(@Nullable @PathVariable String category,
+	@GetMapping("/posts")
+	public ResponseEntity<PostsResponseDto> getPostsByCategory(@RequestParam(required = false, value = "category") String category,
 			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
             Pageable pageable) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
