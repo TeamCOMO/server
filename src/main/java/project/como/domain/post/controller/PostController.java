@@ -2,6 +2,7 @@ package project.como.domain.post.controller;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public class PostController {
 	@PostMapping(value = "/post/create", consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> createPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostCreateRequestDto dto,
-	                                         @Nullable @RequestPart List<MultipartFile> images) {
+	                                         @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images) {
 		postService.createPost(username, dto, images);
 
 		return ResponseEntity.ok().body("success");
@@ -59,8 +60,10 @@ public class PostController {
 
 	@Logging(item = "Post", action = "patch")
 	@PatchMapping("/post/modify")
-	public ResponseEntity<String> modifyPost(@CurrentUser String username, @RequestBody PostModifyRequestDto dto) {
-		postService.modifyPost(username, dto);
+	public ResponseEntity<String> modifyPost(@CurrentUser String username,
+	                                         @RequestPart @Valid PostModifyRequestDto dto,
+	                                         @RequestPart @Size(max = 5) @Valid List<MultipartFile> images) {
+		postService.modifyPost(username, dto, images);
 
 		return ResponseEntity.ok().body("success");
 	}

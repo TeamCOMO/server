@@ -9,17 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.como.domain.image.exception.DeleteInvalidImageException;
 import project.como.domain.image.service.ImageService;
-import project.como.domain.post.exception.HeartConflictException;
-import project.como.domain.post.exception.HeartNotFoundException;
+import project.como.domain.post.exception.*;
 import project.como.domain.post.model.Heart;
 import project.como.domain.post.repository.HeartRepository;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
 import project.como.domain.post.dto.PostsResponseDto;
-import project.como.domain.post.exception.PostAccessDeniedException;
-import project.como.domain.post.exception.PostNotFoundException;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.PostState;
@@ -33,8 +31,8 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
 
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
@@ -62,7 +60,7 @@ public class PostService {
 		postRepository.save(newPost);
 	}
 
-	public void modifyPost(String username, PostModifyRequestDto dto) {
+	public void modifyPost(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
@@ -85,6 +83,20 @@ public class PostService {
 			post.modifyTechs(dto.getTechs());
 		}
 
+		if (dto.getOldUrls() != null) {
+			for (String oldUrl : dto.getOldUrls())
+				if (!post.getImages().contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
+		}
+
+		int totalImageSize = post.getImages().size();
+		totalImageSize += images == null ? 0 : images.size();
+		totalImageSize -= dto.getOldUrls() == null ? 0 : dto.getOldUrls().size();
+
+		if (totalImageSize < 1) throw new DeleteInvalidImageException();
+
+		if (images != null) post.setImages(imageService.uploadImages(username, images));
+		if (dto.getOldUrls() != null)
+			post.getImages().removeAll(imageService.deleteImages(dto.getOldUrls()));
 	}
 
 	public void deletePost(String username, Long postId) {
@@ -93,6 +105,8 @@ public class PostService {
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
+
+		imageService.deleteImages(post.getImages());
 
 		postRepository.delete(post);
 	}

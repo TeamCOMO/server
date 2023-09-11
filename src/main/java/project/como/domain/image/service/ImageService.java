@@ -81,7 +81,7 @@ public class ImageService {
 		return url;
 	}
 
-	public List<String> deleteFiles(List<String> urls) {
+	public List<String> deleteImages(List<String> urls) {
 		ArrayList<String> deletedImages = new ArrayList<>();
 		try {
 			for (String url : urls) {

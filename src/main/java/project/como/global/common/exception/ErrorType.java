@@ -15,7 +15,8 @@ public interface ErrorType {
 		INACTIVE_POST(104),
 		NOT_ELIGIBLE_FOR_APPLICATION(105),
 
-		UNSUPPORTED_FILE_EXTENSION(206)
+		UNSUPPORTED_FILE_EXTENSION(206),
+		DELETE_INVALID_IMAGE(207)
 		;
 
 		private final int errorCode;
@@ -74,7 +75,9 @@ public interface ErrorType {
 		COMMENT_NOT_FOUND(4004),
 
 		INTEREST_NOT_FOUND(4005),
-		HEART_NOT_FOUND(4006)
+		HEART_NOT_FOUND(4006),
+
+		POST_IMAGE_URL_NOT_FOUND(4007)
 		;
 
 		private final int errorCode;

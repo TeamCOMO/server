@@ -104,7 +104,7 @@ class PostControllerTest {
 		dto.setTitle("change test");
 		dto.setBody("change body");
 
-		postService.modifyPost(USERNAME, dto);
+		postService.modifyPost(USERNAME, dto, null);
 
 		Post changedPost = em.find(Post.class, 1);
 
