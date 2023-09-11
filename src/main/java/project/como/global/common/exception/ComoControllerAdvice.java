@@ -89,18 +89,18 @@ public class ComoControllerAdvice {
 	Comment Exception
 	*/
 
-	@ExceptionHandler(CommentNotFoundException.class)
+	@ExceptionHandler(value = CommentNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex){
 
 		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse((new CommentNotFoundException() )));
 	}
-	@ExceptionHandler(CommentForbiddenAccessException.class)
+	@ExceptionHandler(value = CommentForbiddenAccessException.class)
 	public ResponseEntity<ErrorResponse> handleCommentForbiddenAccess(CommentForbiddenAccessException ex){
 
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse((new CommentForbiddenAccessException())));
 	}
 
-	@ExceptionHandler(CommentLevelExceedException.class)
+	@ExceptionHandler(value = CommentLevelExceedException.class)
 	public ResponseEntity<ErrorResponse> handleCommentLevelExceed(CommentLevelExceedException ex){
 
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse((new CommentLevelExceedException() )));
