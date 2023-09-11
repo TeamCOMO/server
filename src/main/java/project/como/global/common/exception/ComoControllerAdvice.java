@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
 import project.como.domain.comment.exception.CommentLevelExceedException;
 import project.como.domain.comment.exception.CommentNotFoundException;
+import project.como.domain.image.exception.FileDeleteException;
+import project.como.domain.image.exception.FileUploadException;
 import project.como.domain.post.exception.*;
 import project.como.domain.user.exception.UserInfoNotFoundException;
 import project.como.domain.user.exception.UserNotEligibleForApplyException;
@@ -55,6 +57,16 @@ public class ComoControllerAdvice {
 		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new HeartNotFoundException()));
 	}
 
+	@ExceptionHandler(value = FileUploadException.class)
+	public ResponseEntity<ErrorResponse> handleFileUploadException(FileUploadException ex) {
+		return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ErrorResponse(new FileUploadException()));
+	}
+
+	@ExceptionHandler(value = FileDeleteException.class)
+	public ResponseEntity<ErrorResponse> handleFileDeleteException(FileDeleteException ex) {
+		return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ErrorResponse(new FileDeleteException()));
+	}
+
 	/*
 	Apply Exception
 	 */
@@ -93,6 +105,4 @@ public class ComoControllerAdvice {
 
 		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse((new CommentLevelExceedException() )));
 	}
-
-
 }
