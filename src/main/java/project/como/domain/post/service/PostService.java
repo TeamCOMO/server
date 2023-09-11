@@ -117,6 +117,7 @@ public class PostService {
 
 		return PostDetailResponseDto.builder()
 				.title(post.getTitle())
+				.imageUrls(post.getImages())
 				.body(post.getBody())
 				.category(post.getCategory())
 				.state(post.getState())

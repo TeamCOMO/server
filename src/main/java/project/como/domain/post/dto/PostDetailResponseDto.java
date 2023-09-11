@@ -16,4 +16,5 @@ public class PostDetailResponseDto {
 	private Category category;
 	private PostState state;
 	private List<Tech> techs;
+	private List<String> imageUrls;
 }
