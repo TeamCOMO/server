@@ -4,17 +4,23 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import project.como.domain.comment.model.Comment;
 
+import java.util.List;
+
 @Data @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CommentDetailDto {
+public class  CommentDetailDto {
+
+    private Long id;
+
+    private Long parentId;
 
     @NotBlank
     private String body;
 
-    public CommentDetailDto(Comment comment){
-        this.body = comment.getBody();
-    }
+    private List<CommentDetailDto> children;
+
+
 }
 /**
  * 현재는 기능이 단순하기에 생성, 수정, 단일 조회 dto의 클래스 형식이 유사함.
