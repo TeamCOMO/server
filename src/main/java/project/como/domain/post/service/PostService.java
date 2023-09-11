@@ -9,8 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.image.exception.DeleteInvalidImageException;
 import project.como.domain.image.service.ImageService;
+import project.como.domain.interest.repository.InterestRepository;
 import project.como.domain.post.exception.*;
 import project.como.domain.post.model.Heart;
 import project.como.domain.post.repository.HeartRepository;
@@ -38,7 +40,9 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
+	private final InterestRepository interestRepository;
 	private final HeartRepository heartRepository;
+	private final CommentRepository commentRepository;
 	private final ImageService imageService;
 
 	public void createPost(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
@@ -108,6 +112,9 @@ public class PostService {
 
 		imageService.deleteImages(post.getImages());
 
+		interestRepository.deleteAllByPostId(postId);
+		heartRepository.deleteAllByPostId(postId);
+		commentRepository.deleteAllByPostId(postId);
 		postRepository.delete(post);
 	}
 
