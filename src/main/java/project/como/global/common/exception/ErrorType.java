@@ -13,7 +13,9 @@ public interface ErrorType {
 		SCRAP_MY_POST(102),
 		HEART_MY_POST(103),
 		INACTIVE_POST(104),
-		NOT_ELIGIBLE_FOR_APPLICATION(105)
+		NOT_ELIGIBLE_FOR_APPLICATION(105),
+
+		UNSUPPORTED_FILE_EXTENSION(206)
 		;
 
 		private final int errorCode;
@@ -105,7 +107,10 @@ public interface ErrorType {
 	}
 
 	enum ServerError implements ErrorType {
-		SERVER_ERROR_DEFAULT(5000)
+		SERVER_ERROR_DEFAULT(5000),
+
+		FILE_UPLOAD_FAIL(5001),
+		FILE_DELETE_FAIL(5002)
 		;
 
 		private final int errorCode;
