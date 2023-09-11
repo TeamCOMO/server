@@ -21,6 +21,4 @@ public class PostCreateRequestDto {
 	private Category category;
 	@NotNull(message = "기술스택을 선택해주세요.")
 	private List<Tech> techs;
-	@Size(max = 5)
-	private List<MultipartFile> images;
 }

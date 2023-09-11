@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.model.Comment;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+@Slf4j
 @Getter
 @Entity
 @Builder
@@ -47,7 +49,7 @@ public class Post extends BaseTimeEntity {
 	private List<Tech> techs;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> images = new LinkedList<>();
+	private List<String> images;
 
 	@NotBlank
 	private String title;
@@ -86,7 +88,10 @@ public class Post extends BaseTimeEntity {
 	public void countHeart() { ++this.heartCount; }
 	public void discountHeart() { --this.heartCount; }
 
-	public void setImages(List<String> uploadedImages) { images.addAll(uploadedImages); }
+	public void setImages(List<String> uploadedImages) {
+		if (this.images == null) this.images = new LinkedList<>();
+		images.addAll(uploadedImages);
+	}
 
 	@OneToMany(mappedBy = "post")
 	private Collection<Comment> comment;

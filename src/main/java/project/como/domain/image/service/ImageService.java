@@ -66,6 +66,7 @@ public class ImageService {
 			}
 			throw e;
 		}
+		log.info("uploadedIMG: {}", uploadedImages);
 		return uploadedImages;
 	}
 

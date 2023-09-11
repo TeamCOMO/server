@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
@@ -15,6 +16,8 @@ import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.service.PostService;
 import project.como.global.auth.model.CurrentUser;
 import project.como.global.common.model.Logging;
+
+import java.util.List;
 
 @Slf4j
 @Transactional
@@ -26,9 +29,11 @@ public class PostController {
 	private final PostService postService;
 
 	@Logging(item = "Post", action = "post")
-	@PostMapping(value = "/post/create", consumes = {"multipart/form-data"})
-	public ResponseEntity<String> createPost(@CurrentUser String username, @RequestBody @Valid PostCreateRequestDto dto) {
-		postService.createPost(username, dto);
+	@PostMapping(value = "/post/create", consumes = {"application/json", "multipart/form-data"})
+	public ResponseEntity<String> createPost(@CurrentUser String username,
+	                                         @RequestPart @Valid PostCreateRequestDto dto,
+	                                         @RequestPart List<MultipartFile> images) {
+		postService.createPost(username, dto, images);
 
 		return ResponseEntity.ok().body("success");
 	}

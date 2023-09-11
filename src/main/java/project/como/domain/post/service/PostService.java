@@ -1,5 +1,6 @@
 package project.como.domain.post.service;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.image.service.ImageService;
 import project.como.domain.post.exception.HeartConflictException;
 import project.como.domain.post.exception.HeartNotFoundException;
@@ -41,7 +43,7 @@ public class PostService {
 	private final HeartRepository heartRepository;
 	private final ImageService imageService;
 
-	public void createPost(String username, PostCreateRequestDto dto) {
+	public void createPost(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		Post newPost = Post.builder()
@@ -55,7 +57,7 @@ public class PostService {
 				.heartCount(0L)
 				.build();
 
-		if (!dto.getImages().isEmpty()) newPost.setImages(imageService.uploadImages(username, dto.getImages()));
+		if (images != null && !images.isEmpty()) newPost.setImages(imageService.uploadImages(username, images));
 
 		postRepository.save(newPost);
 	}
