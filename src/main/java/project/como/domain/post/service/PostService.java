@@ -104,7 +104,9 @@ public class PostService {
 	}
 
 	public PostsResponseDto getPostsByCategory(Pageable pageable, int pageNo, String category) {
-		Page<Post> postPage = postRepository.findAllByCategoryOrderByCreatedDate(Category.valueOf(category), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		Page<Post> postPage = null;
+		if (category != null) postPage = postRepository.findAllByCategoryOrderByCreatedDate(Category.valueOf(category), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		else postPage = postRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())

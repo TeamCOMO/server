@@ -1,5 +1,6 @@
 package project.como.domain.post.controller;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class PostController {
 
 	@Logging(item = "Post", action = "get")
 	@GetMapping("/posts/{category}")
-	public ResponseEntity<PostsResponseDto> getPostsByCategory(@PathVariable String category,
+	public ResponseEntity<PostsResponseDto> getPostsByCategory(@Nullable @PathVariable String category,
 			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
             Pageable pageable) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
