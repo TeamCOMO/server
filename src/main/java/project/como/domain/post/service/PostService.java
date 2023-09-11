@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.como.domain.image.service.ImageService;
 import project.como.domain.post.exception.HeartConflictException;
 import project.como.domain.post.exception.HeartNotFoundException;
 import project.como.domain.post.model.Heart;
@@ -38,6 +39,7 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final HeartRepository heartRepository;
+	private final ImageService imageService;
 
 	public void createPost(String username, PostCreateRequestDto dto) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
@@ -52,6 +54,8 @@ public class PostService {
 				.readCount(0L)
 				.heartCount(0L)
 				.build();
+
+		if (!dto.getImages().isEmpty()) newPost.setImages(imageService.uploadImages(username, dto.getImages()));
 
 		postRepository.save(newPost);
 	}

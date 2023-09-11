@@ -26,7 +26,7 @@ public class PostController {
 	private final PostService postService;
 
 	@Logging(item = "Post", action = "post")
-	@PostMapping("/post/create")
+	@PostMapping(value = "/post/create", consumes = {"multipart/form-data"})
 	public ResponseEntity<String> createPost(@CurrentUser String username, @RequestBody @Valid PostCreateRequestDto dto) {
 		postService.createPost(username, dto);
 
