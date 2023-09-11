@@ -32,7 +32,7 @@ public class PostController {
 	@PostMapping(value = "/post/create", consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> createPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostCreateRequestDto dto,
-	                                         @RequestPart List<MultipartFile> images) {
+	                                         @Nullable @RequestPart List<MultipartFile> images) {
 		postService.createPost(username, dto, images);
 
 		return ResponseEntity.ok().body("success");

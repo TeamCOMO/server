@@ -84,6 +84,7 @@ public class PostService {
 		if (dto.getTechs() != null) {
 			post.modifyTechs(dto.getTechs());
 		}
+
 	}
 
 	public void deletePost(String username, Long postId) {
