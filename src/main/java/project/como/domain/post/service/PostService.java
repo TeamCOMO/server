@@ -42,7 +42,7 @@ public class PostService {
 	private final ImageService imageService;
 
 	public void createPost(String username, PostCreateRequestDto dto) {
-		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		Post newPost = Post.builder()
 				.title(dto.getTitle())
@@ -62,7 +62,7 @@ public class PostService {
 
 	public void modifyPost(String username, PostModifyRequestDto dto) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
-		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
@@ -86,7 +86,7 @@ public class PostService {
 
 	public void deletePost(String username, Long postId) {
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-		User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
