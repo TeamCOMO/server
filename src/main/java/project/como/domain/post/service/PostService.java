@@ -113,6 +113,7 @@ public class PostService {
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
 				.posts(postPage.getContent().stream().map((post) -> PostDetailResponseDto.builder()
+						.id(post.getId())
 						.title(post.getTitle())
 						.body(post.getBody())
 						.category(post.getCategory())
