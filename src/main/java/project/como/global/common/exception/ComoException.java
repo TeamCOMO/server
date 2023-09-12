@@ -44,8 +44,8 @@ public class ComoException extends RuntimeException {
 		}
 	}
 
-	public abstract static class ServerException extends ComoException {
-		public ServerException(ErrorType errorType, String detail) {
+	public abstract static class ServerErrorException extends ComoException {
+		public ServerErrorException(ErrorType errorType, String detail) {
 			super(errorType, detail);
 		}
 	}

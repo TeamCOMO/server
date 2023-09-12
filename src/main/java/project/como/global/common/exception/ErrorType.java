@@ -13,7 +13,10 @@ public interface ErrorType {
 		SCRAP_MY_POST(102),
 		HEART_MY_POST(103),
 		INACTIVE_POST(104),
-		NOT_ELIGIBLE_FOR_APPLICATION(105)
+		NOT_ELIGIBLE_FOR_APPLICATION(105),
+
+		UNSUPPORTED_FILE_EXTENSION(206),
+		DELETE_INVALID_IMAGE(207)
 		;
 
 		private final int errorCode;
@@ -72,7 +75,9 @@ public interface ErrorType {
 		COMMENT_NOT_FOUND(4004),
 
 		INTEREST_NOT_FOUND(4005),
-		HEART_NOT_FOUND(4006)
+		HEART_NOT_FOUND(4006),
+
+		POST_IMAGE_URL_NOT_FOUND(4007)
 		;
 
 		private final int errorCode;
@@ -105,7 +110,10 @@ public interface ErrorType {
 	}
 
 	enum ServerError implements ErrorType {
-		SERVER_ERROR_DEFAULT(5000)
+		SERVER_ERROR_DEFAULT(5000),
+
+		FILE_UPLOAD_FAIL(5001),
+		FILE_DELETE_FAIL(5002)
 		;
 
 		private final int errorCode;
