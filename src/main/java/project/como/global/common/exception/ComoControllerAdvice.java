@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
 import project.como.domain.comment.exception.CommentLevelExceedException;
 import project.como.domain.comment.exception.CommentNotFoundException;
+import project.como.domain.image.exception.DeleteInvalidImageException;
 import project.como.domain.image.exception.FileDeleteException;
 import project.como.domain.image.exception.FileUploadException;
+import project.como.domain.image.exception.UnsupportedFileExtensionException;
 import project.como.domain.post.exception.*;
 import project.como.domain.user.exception.UserInfoNotFoundException;
 import project.como.domain.user.exception.UserNotEligibleForApplyException;
@@ -65,6 +67,21 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(value = FileDeleteException.class)
 	public ResponseEntity<ErrorResponse> handleFileDeleteException(FileDeleteException ex) {
 		return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ErrorResponse(new FileDeleteException()));
+	}
+
+	@ExceptionHandler(value = DeleteInvalidImageException.class)
+	public ResponseEntity<ErrorResponse> handleDeleteInvalidImageException(DeleteInvalidImageException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new DeleteInvalidImageException()));
+	}
+
+	@ExceptionHandler(value = UnsupportedFileExtensionException.class)
+	public ResponseEntity<ErrorResponse> handleUnsupportedFileExtensionException(UnsupportedFileExtensionException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new UnsupportedFileExtensionException()));
+	}
+
+	@ExceptionHandler(value = PostImageUrlNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handlePostImageUrlNotFoundException(PostImageUrlNotFoundException ex) {
+		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new PostImageUrlNotFoundException()));
 	}
 
 	/*
