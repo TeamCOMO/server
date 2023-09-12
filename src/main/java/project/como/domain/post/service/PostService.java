@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.repository.CommentRepository;
-import project.como.domain.image.exception.DeleteInvalidImageException;
 import project.como.domain.image.service.ImageService;
 import project.como.domain.interest.repository.InterestRepository;
 import project.como.domain.post.exception.*;
@@ -28,8 +27,6 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -91,12 +88,6 @@ public class PostService {
 			for (String oldUrl : dto.getOldUrls())
 				if (!post.getImages().contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
 		}
-
-		int totalImageSize = post.getImages().size();
-		totalImageSize += images == null ? 0 : images.size();
-		totalImageSize -= dto.getOldUrls() == null ? 0 : dto.getOldUrls().size();
-
-		if (totalImageSize < 1) throw new DeleteInvalidImageException();
 
 		if (images != null) post.setImages(imageService.uploadImages(username, images));
 		if (dto.getOldUrls() != null)
