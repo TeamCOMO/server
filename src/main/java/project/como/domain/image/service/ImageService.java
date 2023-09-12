@@ -35,7 +35,7 @@ public class ImageService {
 
 	public String uploadImage(String username, MultipartFile file) {
 		Optional<String> contentType = Optional.ofNullable(file.getContentType());
-		if (file.isEmpty() || contentType.get().contains("image")) throw new UnsupportedFileExtensionException();
+		if (file.isEmpty() || !contentType.get().contains("image")) throw new UnsupportedFileExtensionException();
 
 		String fileName = generateFileName(username, file.getOriginalFilename());
 
