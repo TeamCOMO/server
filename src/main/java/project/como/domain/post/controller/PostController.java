@@ -59,7 +59,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "patch")
-	@PatchMapping("/post/modify")
+	@PatchMapping(value = "/post/modify", consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> modifyPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostModifyRequestDto dto,
 	                                         @RequestPart @Size(max = 5) @Valid List<MultipartFile> images) {
