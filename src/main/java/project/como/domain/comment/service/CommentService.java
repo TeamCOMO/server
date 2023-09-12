@@ -21,5 +21,4 @@ public interface CommentService {
 
     public boolean checkDelete(User user, Comment comment);
 
-    //public Comment findComment(); // 대댓글을 달기 위한 용도
 }

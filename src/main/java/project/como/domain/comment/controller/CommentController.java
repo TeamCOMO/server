@@ -35,8 +35,6 @@ public class CommentController {
         return ResponseEntity.ok().body(comments);
     }
 
-    //게시물 댓글 조회(대댓글을 위해?)
-
     //게시물 댓글 수정
     @PatchMapping("/comment/{comment_id}")
     public ResponseEntity<String> updateComment(@CurrentUser String username,

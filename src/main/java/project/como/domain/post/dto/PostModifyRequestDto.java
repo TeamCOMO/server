@@ -1,6 +1,8 @@
 package project.como.domain.post.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.PostState;
 import project.como.domain.post.model.Tech;
@@ -15,4 +17,5 @@ public class PostModifyRequestDto {
 	private Category category;
 	private PostState state;
 	private List<Tech> techs;
+	List<@NotBlank @URL String> oldUrls;
 }

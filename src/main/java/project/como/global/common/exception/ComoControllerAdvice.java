@@ -6,13 +6,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import project.como.domain.comment.exception.CommentForbiddenAccessException;
+import project.como.domain.comment.exception.CommentLevelExceedException;
+import project.como.domain.comment.exception.CommentNotFoundException;
+import project.como.domain.image.exception.DeleteInvalidImageException;
+import project.como.domain.image.exception.FileDeleteException;
+import project.como.domain.image.exception.FileUploadException;
+import project.como.domain.image.exception.UnsupportedFileExtensionException;
 import project.como.domain.post.exception.*;
 import project.como.domain.user.exception.UserInfoNotFoundException;
 import project.como.domain.user.exception.UserNotEligibleForApplyException;
 import project.como.global.auth.exception.ComoLoginFailureException;
 import project.como.global.common.dto.ErrorResponse;
+import project.como.global.common.dto.ExceptionResponse;
+
+import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
+import static project.como.global.common.exception.ComoException.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -26,44 +37,28 @@ public class ComoControllerAdvice {
 		return ResponseEntity.status(UNAUTHORIZED).body(new ErrorResponse(new ComoLoginFailureException()));
 	}
 
-	/*
-	Post Exception
-	 */
-	@ExceptionHandler(value = PostNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handlePostNotFoundException(PostNotFoundException ex) {
-		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new PostNotFoundException()));
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<ErrorResponse> unauthorized(ComoException ex) {
+		return ResponseEntity.status(UNAUTHORIZED).body(new ErrorResponse(ex));
 	}
 
-	@ExceptionHandler(value = PostAccessDeniedException.class)
-	public ResponseEntity<ErrorResponse> handlePostAccessDeniedException(PostAccessDeniedException ex) {
-		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(new PostAccessDeniedException()));
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<ErrorResponse> forbidden(ComoException ex) {
+		return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(ex));
 	}
 
-	@ExceptionHandler(value = HeartConflictException.class)
-	public ResponseEntity<ErrorResponse> handleHeartConflictException(HeartConflictException ex) {
-		return ResponseEntity.status(CONFLICT).body(new ErrorResponse(new HeartConflictException()));
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<ErrorResponse> notfound(ComoException ex) {
+		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(ex));
 	}
 
-	@ExceptionHandler(value = HeartNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleHeartNotFoundException(HeartNotFoundException ex) {
-		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new HeartNotFoundException()));
+	@ExceptionHandler(ConflictException.class)
+	public ResponseEntity<ErrorResponse> conflict(ComoException ex) {
+		return ResponseEntity.status(CONFLICT).body(new ErrorResponse(ex));
 	}
 
-	/*
-	Apply Exception
-	 */
-	@ExceptionHandler(value = UserInfoNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleUserInfoNotFoundException(UserInfoNotFoundException ex) {
-		return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(new UserInfoNotFoundException()));
-	}
-
-	@ExceptionHandler(value = UserNotEligibleForApplyException.class)
-	public ResponseEntity<ErrorResponse> handleUserNotEligibleForApplyException(UserNotEligibleForApplyException ex) {
-		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new UserNotEligibleForApplyException()));
-	}
-
-	@ExceptionHandler(value = PostInactiveException.class)
-	public ResponseEntity<ErrorResponse> handlePostInactiveException(PostInactiveException ex) {
-		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(new PostInactiveException()));
+	@ExceptionHandler(ServerErrorException.class)
+	public ResponseEntity<ErrorResponse> serverError(ComoException ex) {
+		return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ErrorResponse(ex));
 	}
 }

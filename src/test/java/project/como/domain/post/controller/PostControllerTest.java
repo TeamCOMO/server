@@ -53,7 +53,7 @@ class PostControllerTest {
 		techList.add(Tech.Spring);
 		dto.setTechs(techList);
 
-		postService.createPost(user.getUsername(), dto);
+		postService.createPost(user.getUsername(), dto, null);
 
 		Post post = em.find(Post.class, 1);
 
@@ -104,7 +104,7 @@ class PostControllerTest {
 		dto.setTitle("change test");
 		dto.setBody("change body");
 
-		postService.modifyPost(USERNAME, dto);
+		postService.modifyPost(USERNAME, dto, null);
 
 		Post changedPost = em.find(Post.class, 1);
 
