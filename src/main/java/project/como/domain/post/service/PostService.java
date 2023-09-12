@@ -107,14 +107,13 @@ public class PostService {
 		Page<Post> postPage = null;
 		if (category == null) postPage = postRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 		else postPage = postRepository.findAllByCategoryOrderByCreatedDateDesc(Category.valueOf(category), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
-		log.info("category : {}", category);
-		log.info("totalCount : {}", postPage.getTotalElements());
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
 				.posts(postPage.getContent().stream().map((post) -> PostDetailResponseDto.builder()
+						.id(post.getId())
 						.title(post.getTitle())
 						.body(post.getBody())
 						.category(post.getCategory())

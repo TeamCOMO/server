@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @Builder
 public class PostDetailResponseDto {
+	private Long id;
 	private String title;
 	private String body;
 	private Category category;
