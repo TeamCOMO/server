@@ -15,9 +15,4 @@ public class ComoApplication {
 		SpringApplication.run(ComoApplication.class, args);
 	}
 
-	@Bean
-	JPAQueryFactory queryFactory(EntityManager em) {
-		return new JPAQueryFactory(em);
-	}
-
 }
