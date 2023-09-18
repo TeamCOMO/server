@@ -18,4 +18,5 @@ public class PostDetailResponseDto {
 	private PostState state;
 	private List<Tech> techs;
 	private List<String> imageUrls;
+	private Long heartCount;
 }
