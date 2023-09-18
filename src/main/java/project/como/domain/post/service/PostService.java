@@ -120,6 +120,7 @@ public class PostService {
 				.category(post.getCategory())
 				.state(post.getState())
 				.techs(post.getTechs())
+				.heartCount(post.getHeartCount())
 				.build();
 	}
 
@@ -139,6 +140,7 @@ public class PostService {
 						.category(post.getCategory())
 						.state(post.getState())
 						.techs(post.getTechs())
+						.heartCount(post.getHeartCount())
 						.build()).toList())
 				.build();
 	}
