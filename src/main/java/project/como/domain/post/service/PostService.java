@@ -12,20 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.image.service.ImageService;
 import project.como.domain.interest.repository.InterestRepository;
+import project.como.domain.post.dto.*;
 import project.como.domain.post.exception.*;
-import project.como.domain.post.model.Heart;
+import project.como.domain.post.model.*;
 import project.como.domain.post.repository.HeartRepository;
-import project.como.domain.post.dto.PostCreateRequestDto;
-import project.como.domain.post.dto.PostDetailResponseDto;
-import project.como.domain.post.dto.PostModifyRequestDto;
-import project.como.domain.post.dto.PostsResponseDto;
-import project.como.domain.post.model.Category;
-import project.como.domain.post.model.Post;
-import project.como.domain.post.model.PostState;
+import project.como.domain.post.repository.PostCustomRepositoryImpl;
 import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -37,6 +34,7 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
+	private final PostCustomRepositoryImpl postRepositoryImpl;
 	private final InterestRepository interestRepository;
 	private final HeartRepository heartRepository;
 	private final CommentRepository commentRepository;
@@ -110,38 +108,33 @@ public class PostService {
 	}
 
 	public PostDetailResponseDto getDetailPost(Long postId) {
-		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-		post.countRead();
+		PostDetailResponseDto dto = postRepositoryImpl.findPostDetailById(postId);
 
-		return PostDetailResponseDto.builder()
-				.title(post.getTitle())
-				.imageUrls(post.getImages())
-				.body(post.getBody())
-				.category(post.getCategory())
-				.state(post.getState())
-				.techs(post.getTechs())
-				.heartCount(post.getHeartCount())
-				.build();
+		log.info("dto : {}", dto);
+		return dto;
 	}
 
-	public PostsResponseDto getPostsByCategory(Pageable pageable, int pageNo, String category) {
-		Page<Post> postPage = null;
-		if (category == null) postPage = postRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
-		else postPage = postRepository.findAllByCategoryOrderByCreatedDateDesc(Category.valueOf(category), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+	public PostsResponseDto getPostsByCategory(int pageNo, String category, List<String> stacks) {
+//		Page<Post> postPage = null;
+		List<Tech> stack = new ArrayList<>();
+		if (stacks != null) {
+			for (String s : stacks) {
+				stack.add(Tech.valueOf(s));
+			}
+		}
+
+//		if (category == null) postPage = postRepository.findAllByOrderByCreatedDateDesc(stack, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+//		else postPage = postRepository.findAllByCategoryOrderByCreatedDateDesc(Category.valueOf(category), stack, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		Page<PostDetailResponseDto> postPage = postRepositoryImpl.findAllByCategoryAndTechs(Category.valueOf(category), stack, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+//		Page<PostDetailResponseDto> postPage = postRepositoryImpl.findAll(Category.valueOf(category), stack, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
-				.posts(postPage.getContent().stream().map((post) -> PostDetailResponseDto.builder()
-						.id(post.getId())
-						.title(post.getTitle())
-						.body(post.getBody())
-						.category(post.getCategory())
-						.state(post.getState())
-						.techs(post.getTechs())
-						.heartCount(post.getHeartCount())
-						.build()).toList())
+				.posts(postPage.getContent())
 				.build();
 	}
 

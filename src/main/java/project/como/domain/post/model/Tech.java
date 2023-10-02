@@ -1,7 +1,9 @@
 package project.como.domain.post.model;
 
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
@@ -39,5 +41,6 @@ public enum Tech {
 	Jest("Jest"),
 	C("C");
 
-	private String stack;
+	private final String stack;
+
 }

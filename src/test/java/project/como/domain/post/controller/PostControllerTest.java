@@ -21,6 +21,7 @@ import project.como.domain.post.service.PostService;
 import project.como.domain.user.model.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,9 +83,10 @@ class PostControllerTest {
 	@DisplayName("게시물 카테고리별 조회")
 	void getPostsByCategory() {
 		final String CATEGORY = "Study";
+		final List<String> STACKS = List.of("Java", "Spring");
 		Pageable pageable = PageRequest.of(0, 5);
 
-		PostsResponseDto dto = postService.getPostsByCategory(pageable, 0, CATEGORY);
+		PostsResponseDto dto = postService.getPostsByCategory(0, CATEGORY, STACKS);
 
 		assertThat(dto.getTotalElements()).isEqualTo(3);
 		assertThat(dto.getPosts().get(0).getTitle()).isEqualTo("test title");

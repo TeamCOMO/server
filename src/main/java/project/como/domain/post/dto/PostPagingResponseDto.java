@@ -1,17 +1,18 @@
 package project.como.domain.post.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.PostState;
 import project.como.domain.post.model.Tech;
 
 import java.util.List;
 
-
 @Data
-@Builder
-public class PostDetailResponseDto {
+@NoArgsConstructor
+public class PostPagingResponseDto {
 	private Long id;
 	private String title;
 	private String body;
@@ -21,17 +22,14 @@ public class PostDetailResponseDto {
 	private List<String> images;
 	private Long heartCount;
 
-	public PostDetailResponseDto() {
-	}
-
 	@QueryProjection
-	public PostDetailResponseDto(Long id, String title, String body, Category category, PostState state, List<Tech> techs, List<String> images, Long heartCount) {
+	public PostPagingResponseDto(Long id, String title, String body, Category category, PostState state, List<Tech> techs, List<String> images, Long heartCount) {
 		this.id = id;
 		this.title = title;
 		this.body = body;
 		this.category = category;
 		this.state = state;
-		this.techs = null;
+		this.techs = techs;
 		this.images = images;
 		this.heartCount = heartCount;
 	}

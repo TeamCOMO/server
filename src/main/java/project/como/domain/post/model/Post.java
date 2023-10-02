@@ -44,11 +44,12 @@ public class Post extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	private Category category;
 
-	@Column(nullable = false)
-	@ElementCollection(fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.LAZY)
+	@Enumerated(EnumType.STRING)
+	@CollectionTable(name = "post_techs", joinColumns = @JoinColumn(name = "post_post_id"))
 	private List<Tech> techs;
 
-	@ElementCollection(fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.LAZY)
 	private List<String> images;
 
 	@NotBlank
