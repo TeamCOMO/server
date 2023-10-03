@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
 import project.como.domain.comment.exception.CommentLevelExceedException;
 import project.como.domain.comment.exception.CommentNotFoundException;
-import project.como.domain.image.exception.DeleteInvalidImageException;
+//import project.como.domain.image.exception.DeleteInvalidImageException;
 import project.como.domain.image.exception.FileDeleteException;
 import project.como.domain.image.exception.FileUploadException;
 import project.como.domain.image.exception.UnsupportedFileExtensionException;

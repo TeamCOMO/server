@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
+import project.como.domain.comment.dto.CommentCreateResponseDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
@@ -35,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public void writeComment(String username, Long postId, CommentCreateRequestDto dto) {
+    public CommentCreateResponseDto writeComment(String username, Long postId, CommentCreateRequestDto dto) {
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
@@ -57,6 +58,9 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         commentRepository.save(comment);
+        return CommentCreateResponseDto.builder()
+                .id(comment.getId())
+                .build();
     }
 
     @Override

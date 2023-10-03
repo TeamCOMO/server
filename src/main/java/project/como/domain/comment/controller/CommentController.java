@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
+import project.como.domain.comment.dto.CommentCreateResponseDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
 import project.como.domain.comment.service.CommentServiceImpl;
@@ -20,11 +21,11 @@ public class CommentController {
 
     //게시물 댓글 생성
     @PostMapping("/post/{post_id}/comment")
-    public ResponseEntity<String> createComment(@PathVariable("post_id") Long postId
+    public ResponseEntity<CommentCreateResponseDto> createComment(@PathVariable("post_id") Long postId
             , @RequestBody @Valid CommentCreateRequestDto dto, @CurrentUser String username) { //@CurrentUser를 통해 인증된 username 가져옴
-        commentService.writeComment(username, postId, dto);
+        CommentCreateResponseDto commendDto = commentService.writeComment(username, postId, dto);
 
-        return ResponseEntity.ok().body("success");
+        return ResponseEntity.ok().body(commendDto);
     }
 
     //게시물 댓글 목록 조회
