@@ -3,6 +3,7 @@ package project.como.domain.post.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -12,17 +13,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
+import project.como.domain.image.model.Image;
 import project.como.domain.post.dto.*;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.Tech;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import static project.como.domain.image.model.QImage.*;
 import static project.como.domain.post.model.QPost.*;
+import static project.como.domain.post.model.QTech.*;
 
 @Slf4j
 @Repository
@@ -30,92 +32,41 @@ import static project.como.domain.post.model.QPost.*;
 public class PostCustomRepositoryImpl implements PostCustomRepository {
 	private final JPAQueryFactory queryFactory;
 
-	public Page<PostDetailResponseDto> findAllByCategoryAndTechs(Category category, List<Tech> techs, Pageable pageable) {
-
-		List<PostDetailResponseDto> content = queryFactory.select(
-					new QPostDetailResponseDto(
-							post.id,
-							post.title,
-							post.body,
-							post.category,
-							post.state,
-							post.techs,
-							post.images,
-							post.heartCount)
-				)
-				.from(post)
+	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
+		List<Post> tmp_posts = queryFactory.selectFrom(post)
+				.join(post.techs)
+				.where(categoryEq(category)
+						.and(containsTechs(stacks)))
 				.orderBy(post.createdDate.desc())
 				.fetch();
 
-//		Map<Long, List<PostTechsDto>> postTechsMap = postIdToPostTechsDtoMap(content);
+		List<Post> posts = tmp_posts.subList((int)pageable.getOffset(), Math.min((int)pageable.getOffset() + pageable.getPageSize(), tmp_posts.size()));
 
-
-
-//		content.forEach(dto -> dto.setTechs(postTechsMap.get(dto.getId())));
-
-//		for (PostPagingResponseDto dto : content) {
-//			List<PostTechsDto> postTechsDtos = postTechsMap.get(dto.getId());
-//			for (PostTechsDto techDto : postTechsDtos) {
-//				techList.add(techDto.getTechs().get);
-//			}
-//			dto.setTechs(postTechsMap.get(dto.getId()));
-//		}
-
-		int count = queryFactory.selectFrom(post)
-				.where(categoryEq(category))
-				.fetch().size();
-
-		return new PageImpl<>(content, pageable, count);
-	}
-
-	public Page<PostDetailResponseDto> findAll(Category category, List<Tech> techs, Pageable pageable) {
-		List<Post> content = queryFactory.selectFrom(post)
-				.where(categoryEq(category)
-						.and(containsTechs(techs)))
-				.fetch();
-
-		List<PostDetailResponseDto> result = content.stream().map(post -> {
-			PostDetailResponseDto dto = new PostDetailResponseDto();
+		List<PostPagingResponseDto> content = posts.stream().map(post -> {
+			PostPagingResponseDto dto = new PostPagingResponseDto();
 			dto.setId(post.getId());
 			dto.setTitle(post.getTitle());
-			dto.setBody(post.getBody());
 			dto.setCategory(post.getCategory());
 			dto.setState(post.getState());
-			dto.setTechs(post.getTechs());
-			dto.setImages(post.getImages());
+			dto.setTechs(post.getTechs().stream().map(Tech::getStack).collect(Collectors.toList()));
 			dto.setHeartCount(post.getHeartCount());
 			return dto;
 		}).toList();
 
-		int count = queryFactory.selectFrom(post)
+		JPAQuery<Long> countQuery = queryFactory.select(post.count())
+				.from(post)
 				.where(categoryEq(category)
-						.and(containsTechs(techs)))
-				.fetch().size();
+						.and(containsTechs(stacks)))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize());
 
-		return new PageImpl<>(result, pageable, count);
-	}
-
-	private Map<Long, List<PostTechsDto>> postIdToPostTechsDtoMap(List<PostPagingResponseDto> content) {
-		List<Long> postIds = content.stream()
-				.map(PostPagingResponseDto::getId)
-				.toList();
-
-		List<PostTechsDto> postTechsDto = queryFactory.select(
-						new QPostTechsDto(
-								post.id,
-								post.techs
-						)
-				).from(post)
-				.where(post.id.in(postIds))
-				.fetch();
-
-		return postTechsDto.stream()
-				.collect(Collectors.groupingBy(PostTechsDto::getPostId));
+		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
 	public PostDetailResponseDto findPostDetailById(Long id) {
 		return queryFactory.select(
-				new QPostDetailResponseDto(
+				Projections.constructor(
+						PostDetailResponseDto.class,
 						post.id,
 						post.title,
 						post.body,
@@ -123,9 +74,11 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 						post.state,
 						post.techs,
 						post.images,
-						post.heartCount)
-				)
+						post.heartCount
+				))
 				.from(post)
+				.join(post.techs, tech).fetchJoin()
+				.join(post.images, image).fetchJoin()
 				.where(post.id.eq(id))
 				.fetchOne();
 	}
@@ -134,15 +87,32 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		return category != null ? post.category.eq(category) : null;
 	}
 
-	private BooleanBuilder containsTechs(List<Tech> techs) {
+	private BooleanBuilder containsTechs(List<String> stacks) {
 		BooleanBuilder builder = new BooleanBuilder();
 
-		if (techs == null || techs.isEmpty()) return builder;
+//		post.techs
+//
+//		post.techs.forEach(tech -> {
+//			builder.or(tech.stack.in(stacks));
+//		});
 
-		for (Tech tech : techs) {
-			builder.and(post.techs.contains(tech));
+		if (stacks == null || stacks.isEmpty()) return builder;
+		else {
+			builder.and(
+					post.in(
+							JPAExpressions.select(tech.post)
+									.from(tech)
+									.where(tech.stack.in(stacks))
+					)
+			);
 		}
 
+
 		return builder;
+	}
+
+	private BooleanExpression containsTech(List<String> stacks) {
+		if (stacks == null || stacks.isEmpty()) return null;
+		else return stacks.stream().map(post.techs.any().stack::eq).reduce(BooleanExpression::or).orElse(null);
 	}
 }

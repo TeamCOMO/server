@@ -12,5 +12,5 @@ import java.util.List;
 
 public interface PostCustomRepository {
 
-	Page<PostDetailResponseDto> findAllByCategoryAndTechs(Category category, List<Tech> techs, Pageable pageable);
+	Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable);
 }

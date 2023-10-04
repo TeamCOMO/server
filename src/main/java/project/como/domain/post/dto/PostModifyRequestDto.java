@@ -16,6 +16,6 @@ public class PostModifyRequestDto {
 	private String body;
 	private Category category;
 	private PostState state;
-	private List<Tech> techs;
+	private List<String> techs;
 	List<@NotBlank @URL String> oldUrls;
 }
