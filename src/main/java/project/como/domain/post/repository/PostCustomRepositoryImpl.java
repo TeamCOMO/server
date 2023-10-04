@@ -32,7 +32,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
 		List<Post> tmp_posts = queryFactory.selectFrom(post)
-				.join(post.techs)
+				.join(post.techs).fetchJoin()
 				.where(categoryEq(category)
 						.and(containsTechs(stacks)))
 				.orderBy(post.createdDate.desc())
@@ -63,7 +63,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 	public PostDetailResponseDto findPostDetailById(Long id) {
 		Post result = queryFactory.selectFrom(post)
-				.join(post.techs, tech)
+				.join(post.techs, tech).fetchJoin()
 				.leftJoin(post.images, image)
 				.where(post.id.eq(id))
 				.fetchOne();
@@ -74,7 +74,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 				.body(result.getBody())
 				.category(result.getCategory())
 				.state(result.getState())
-				.techs(result.getTechs().stream().map(Tech::getStack).collect(Collectors.toList()))
+				.techs(result.getTechs().stream().map(Tech::getStack).distinct().collect(Collectors.toList()))
 				.images(result.getImages().stream().map(Image::getUrl).collect(Collectors.toList()))
 				.heartCount(result.getHeartCount())
 				.build();
