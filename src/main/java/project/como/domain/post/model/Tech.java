@@ -20,8 +20,8 @@ public class Tech {
 	@Id @Column(name = "tech_id")
 	private Long id;
 
-	@ManyToOne
 	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Post post;
 
 	private String stack;

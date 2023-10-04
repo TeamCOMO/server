@@ -21,7 +21,7 @@ public class Image {
 	@Id @Column(name = "image_id")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private Post post;
 
