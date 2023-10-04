@@ -1,7 +1,6 @@
 package project.como.domain.post.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -9,7 +8,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
@@ -64,23 +62,22 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 	}
 
 	public PostDetailResponseDto findPostDetailById(Long id) {
-		return queryFactory.select(
-				Projections.constructor(
-						PostDetailResponseDto.class,
-						post.id,
-						post.title,
-						post.body,
-						post.category,
-						post.state,
-						post.techs,
-						post.images,
-						post.heartCount
-				))
-				.from(post)
-				.join(post.techs, tech).fetchJoin()
-				.join(post.images, image).fetchJoin()
+		Post result = queryFactory.selectFrom(post)
+				.join(post.techs, tech)
+				.leftJoin(post.images, image)
 				.where(post.id.eq(id))
 				.fetchOne();
+
+		return PostDetailResponseDto.builder()
+				.id(result.getId())
+				.title(result.getTitle())
+				.body(result.getBody())
+				.category(result.getCategory())
+				.state(result.getState())
+				.techs(result.getTechs().stream().map(Tech::getStack).collect(Collectors.toList()))
+				.images(result.getImages().stream().map(Image::getUrl).collect(Collectors.toList()))
+				.heartCount(result.getHeartCount())
+				.build();
 	}
 
 	private BooleanExpression categoryEq(Category category) {
@@ -89,12 +86,6 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 	private BooleanBuilder containsTechs(List<String> stacks) {
 		BooleanBuilder builder = new BooleanBuilder();
-
-//		post.techs
-//
-//		post.techs.forEach(tech -> {
-//			builder.or(tech.stack.in(stacks));
-//		});
 
 		if (stacks == null || stacks.isEmpty()) return builder;
 		else {
@@ -107,12 +98,6 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 			);
 		}
 
-
 		return builder;
-	}
-
-	private BooleanExpression containsTech(List<String> stacks) {
-		if (stacks == null || stacks.isEmpty()) return null;
-		else return stacks.stream().map(post.techs.any().stack::eq).reduce(BooleanExpression::or).orElse(null);
 	}
 }
