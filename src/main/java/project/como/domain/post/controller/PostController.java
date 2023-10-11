@@ -58,6 +58,17 @@ public class PostController {
 		return ResponseEntity.ok().body(dto);
 	}
 
+
+
+	@GetMapping("/posts/myself")
+	public ResponseEntity<PostsResponseDto> getPostsByMyself(@CurrentUser String username,
+	                                                         @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
+		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
+		PostsResponseDto dto = postService.getPostsByMyself(username, pageNo);
+
+		return ResponseEntity.ok().body(dto);
+	}
+
 	@Logging(item = "Post", action = "patch")
 	@PatchMapping(value = "/post/modify", consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> modifyPost(@CurrentUser String username,
