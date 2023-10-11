@@ -1,8 +1,10 @@
 package project.como.domain.post.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
+import lombok.NoArgsConstructor;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.PostState;
 import project.como.domain.post.model.Tech;
@@ -10,12 +12,14 @@ import project.como.domain.post.model.Tech;
 import java.util.List;
 
 @Data
-public class PostModifyRequestDto {
-	private Long postId;
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class PostPagingResponseDto {
+	private Long id;
 	private String title;
-	private String body;
 	private Category category;
 	private PostState state;
 	private List<String> techs;
-	List<@NotBlank @URL String> oldUrls;
+	private Long heartCount;
 }

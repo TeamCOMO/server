@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.image.exception.FileDeleteException;
 import project.como.domain.image.exception.FileUploadException;
 import project.como.domain.image.exception.UnsupportedFileExtensionException;
+import project.como.domain.image.model.Image;
+import project.como.domain.image.repository.ImageRepository;
+import project.como.domain.post.model.Post;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class ImageService {
 	private final AmazonS3 amazonS3;
+	private final ImageRepository imageRepository;
 
 	private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSSS");
 
@@ -54,7 +58,7 @@ public class ImageService {
 		return amazonS3.getUrl(bucket, fileName).toString();
 	}
 
-	public List<String> uploadImages(String username, List<MultipartFile> files) {
+	public void uploadImages(String username, Post post, List<MultipartFile> files) {
 		ArrayList<String> uploadedImages = new ArrayList<>();
 		try {
 			for (MultipartFile file : files) {
@@ -67,7 +71,14 @@ public class ImageService {
 			throw e;
 		}
 		log.info("uploadedIMG: {}", uploadedImages);
-		return uploadedImages;
+
+		imageRepository.saveAll(
+				uploadedImages.stream()
+						.map(url -> Image.builder()
+								.post(post)
+								.url(url)
+								.build())
+						.toList());
 	}
 
 	public String deleteImage(String url) {
@@ -81,17 +92,20 @@ public class ImageService {
 		return url;
 	}
 
-	public List<String> deleteImages(List<String> urls) {
-		ArrayList<String> deletedImages = new ArrayList<>();
+	public void deleteImages(List<String> urls) {
+		imageRepository.deleteAllByUrlIn(urls);
 		try {
 			for (String url : urls) {
-				deletedImages.add(deleteImage(url));
+				deleteImage(url);
 			}
 		} catch (FileDeleteException ignored) {}
-		return deletedImages;
 	}
 
 	private String generateFileName(String username, String originalFileName) {
 		return username + "-" + simpleDateFormat.format(new Date()) + (originalFileName != null ? "-" + originalFileName : "");
+	}
+
+	public List<Image> findImagesByPostId(Long postId) {
+		return imageRepository.findAllByPostId(postId);
 	}
 }

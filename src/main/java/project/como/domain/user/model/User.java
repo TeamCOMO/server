@@ -22,7 +22,6 @@ import static jakarta.persistence.GenerationType.*;
 public class User implements UserDetails {
 
 	@Id
-	@Column(name = "user_id")
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 

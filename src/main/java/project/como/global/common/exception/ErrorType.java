@@ -113,7 +113,8 @@ public interface ErrorType {
 		SERVER_ERROR_DEFAULT(5000),
 
 		FILE_UPLOAD_FAIL(5001),
-		FILE_DELETE_FAIL(5002)
+		FILE_DELETE_FAIL(5002),
+		EXCEEDED_TOTAL_FILE_COUNT(5003)
 		;
 
 		private final int errorCode;

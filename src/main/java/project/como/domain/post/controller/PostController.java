@@ -50,10 +50,10 @@ public class PostController {
 	@Logging(item = "Post", action = "get")
 	@GetMapping("/posts")
 	public ResponseEntity<PostsResponseDto> getPostsByCategory(@RequestParam(required = false) String category,
-			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
-            Pageable pageable) {
+			@RequestParam(required = false) List<String> stacks,
+			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
-		PostsResponseDto dto = postService.getPostsByCategory(pageable, pageNo, category);
+		PostsResponseDto dto = postService.getPostsByCategory(pageNo, category, stacks);
 
 		return ResponseEntity.ok().body(dto);
 	}

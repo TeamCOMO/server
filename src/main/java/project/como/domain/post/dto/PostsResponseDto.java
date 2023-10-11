@@ -13,5 +13,5 @@ public class PostsResponseDto {
 	private int totalPages;
 	private long totalElements;
 	private int currentPage;
-	private List<PostDetailResponseDto> posts;
+	private List<PostPagingResponseDto> posts;
 }

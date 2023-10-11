@@ -1,29 +1,29 @@
-package project.como.domain.post.model;
+package project.como.domain.image.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.como.domain.post.model.Post;
-import project.como.domain.user.model.User;
 
 import static jakarta.persistence.GenerationType.*;
 
+@Getter
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Heart {
+public class Image {
 
-	@Id
 	@GeneratedValue(strategy = IDENTITY)
+	@Id @Column(name = "image_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id")
+	@JsonIgnore
 	private Post post;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	private String url;
 }
