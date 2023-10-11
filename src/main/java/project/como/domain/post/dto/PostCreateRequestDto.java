@@ -20,5 +20,5 @@ public class PostCreateRequestDto {
 	@NotNull(message = "카테고리를 선택해주세요.")
 	private Category category;
 	@NotNull(message = "기술스택을 선택해주세요.")
-	private List<Tech> techs;
+	private List<String> techs;
 }
