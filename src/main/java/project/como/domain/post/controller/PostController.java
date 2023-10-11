@@ -60,6 +60,7 @@ public class PostController {
 
 
 
+	@Logging(item = "Post", action = "get")
 	@GetMapping("/posts/myself")
 	public ResponseEntity<PostsResponseDto> getPostsByMyself(@CurrentUser String username,
 	                                                         @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
