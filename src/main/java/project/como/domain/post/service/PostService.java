@@ -24,6 +24,7 @@ import project.como.domain.post.repository.TechRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
+import project.como.global.auth.exception.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -145,6 +146,26 @@ public class PostService {
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
 				.posts(postPage.getContent())
+				.build();
+	}
+
+	public PostsResponseDto getPostsByMyself(String username, int pageNo) {
+		User user = userRepository.findByUsername(username).orElseThrow(UnauthorizedException::new);
+
+		Page<Post> postPage = postRepository.findAllByUserOrderByCreatedDateDesc(user, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		return PostsResponseDto.builder()
+				.totalPages(postPage.getTotalPages())
+				.totalElements(postPage.getTotalElements())
+				.currentPage(postPage.getNumber())
+				.posts(postPage.stream().map(p -> PostPagingResponseDto.builder()
+						.id(p.getId())
+						.title(p.getTitle())
+						.category(p.getCategory())
+						.state(p.getState())
+						.techs(p.getTechs().stream().map(Tech::getStack).toList())
+						.heartCount(p.getHeartCount())
+						.build()).toList())
 				.build();
 	}
 
