@@ -91,26 +91,6 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		}
 
 		return where;
-//		else {
-//			builder.and(
-//
-//					post.techList.contains(JPAExpressions.
-//							selectFrom(postTech)
-//							.where(postTech.tech.stack.in(stacks)))
-//			);
-//			for (String tech : stacks) {
-//				builder.and(post.techList.contains(
-//						JPAExpressions.selectFrom(postTech)
-//								.where(postTech.tech.stack.eq(tech))
-//				));
-////				builder.and(post.techList.in(
-////						JPAExpressions
-////								.select(postTech.tech.stack)
-////								.from(post)
-////								.join(post.techList, postTech)
-////								.where(postTech.tech.stack.eq(tech))
-////				));
-//			}
 		// 하나라도 포함되면 Post의 조건에 맞도록 해야함.
 		// 예를 들어, Java, Spring 을 골랐을 때 둘 다 있는 Post만 제시하는 것이 아니라 Java만 있는 게시물과 Spring만 있는 게시물, 둘 다 포함하는 게사물 모두 제시해야함.
 	}
