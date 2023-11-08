@@ -1,6 +1,7 @@
 package project.como.domain.post.service;
 
 import jakarta.annotation.Nullable;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,8 +19,9 @@ import project.como.domain.post.dto.*;
 import project.como.domain.post.exception.*;
 import project.como.domain.post.model.*;
 import project.como.domain.post.repository.HeartRepository;
-import project.como.domain.post.repository.PostCustomRepositoryImpl;
+import project.como.domain.post.repository.PostCustomRepository;
 import project.como.domain.post.repository.PostRepository;
+import project.como.domain.post.repository.PostTechRepository;
 import project.como.domain.post.repository.TechRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
@@ -39,13 +41,14 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
-	private final PostCustomRepositoryImpl postRepositoryImpl;
+	private final PostCustomRepository postCustomRepository;
 	private final InterestRepository interestRepository;
 	private final HeartRepository heartRepository;
 	private final CommentRepository commentRepository;
 	private final ImageService imageService;
 	private final ImageRepository imageRepository;
 	private final TechRepository techRepository;
+	private final PostTechRepository postTechRepository;
 
 	public void createPost(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -60,18 +63,14 @@ public class PostService {
 				.heartCount(0L)
 				.build();
 
-		List<Tech> techList = new LinkedList<>();
-		for (String tech : dto.getTechs()) {
-			techList.add(Tech.builder()
-					.post(newPost)
-					.stack(tech)
-					.build());
-		}
+		List<PostTech> mappingList = mappingPostAndTech(newPost, dto.getTechs());
+
+		newPost.addTechs(mappingList);
+		postTechRepository.saveAll(mappingList);
 
 		if (images != null && !images.isEmpty()) imageService.uploadImages(username, newPost, images);
 
 		postRepository.save(newPost);
-		techRepository.saveAll(techList);
 	}
 
 	public void modifyPost(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
@@ -95,11 +94,8 @@ public class PostService {
 			post.modifyState(dto.getState());
 		}
 		if (dto.getTechs() != null) {
-			techRepository.deleteAllByPostId(post.getId());
-			techRepository.saveAll(dto.getTechs().stream().map(tech -> Tech.builder()
-					.post(post)
-					.stack(tech)
-					.build()).toList());
+			postTechRepository.deleteAllByPostId(post.getId());
+			postTechRepository.saveAll(mappingPostAndTech(post, dto.getTechs()));
 		}
 
 		if (dto.getOldUrls() != null) {
@@ -132,14 +128,14 @@ public class PostService {
 	}
 
 	public PostDetailResponseDto getDetailPost(Long postId) {
-		PostDetailResponseDto dto = postRepositoryImpl.findPostDetailById(postId);
+		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId);
 
 		log.info("dto : {}", dto);
 		return dto;
 	}
 
 	public PostsResponseDto getPostsByCategory(int pageNo, String category, List<String> stacks) {
-		Page<PostPagingResponseDto> postPage = postRepositoryImpl.findAllByCategoryAndTechs(Category.valueOf(category), stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		Page<PostPagingResponseDto> postPage = postCustomRepository.findAllByCategoryAndTechs(Category.valueOf(category), stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
@@ -163,7 +159,7 @@ public class PostService {
 						.title(p.getTitle())
 						.category(p.getCategory())
 						.state(p.getState())
-						.techs(p.getTechs().stream().map(Tech::getStack).toList())
+						.techs(p.getTechList().stream().distinct().map(pt -> pt.getTech().getStack()).toList())
 						.heartCount(p.getHeartCount())
 						.build()).toList())
 				.build();
@@ -197,4 +193,23 @@ public class PostService {
 		post.discountHeart();
 	}
 
+	private List<PostTech> mappingPostAndTech(Post post, List<String> techList) {
+		List<PostTech> mappingList = new ArrayList<>();
+
+		for (String stack : techList) {
+			Optional<Tech> tech = techRepository.findByStack(stack);
+			if (tech.isEmpty()) {
+				tech = Optional.of(techRepository.save(Tech.builder().stack(stack).build()));
+			}
+			// 처음에 DB에 주입해줘도 될 거 같은 로직
+
+
+			mappingList.add(PostTech.builder()
+					.post(post)
+					.tech(tech.get())
+					.build());
+		}
+
+		return mappingList;
+	}
 }
