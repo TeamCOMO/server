@@ -2,6 +2,7 @@ package project.como.domain.post.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,21 +27,22 @@ import java.util.List;
 public class PostController {
 
 	private final PostService postService;
+	private static final String POST_API_ENDPOINT = "/api/v1/post/";
 
 	@Logging(item = "Post", action = "post")
 	@PostMapping(consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> createPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostCreateRequestDto dto,
 	                                         @RequestPart(required = false) @Size(max = 5) @Valid List<MultipartFile> images) {
-		postService.createPost(username, dto, images);
+		URI location = URI.create(POST_API_ENDPOINT + postService.create(username, dto, images));
 
-		return ResponseEntity.ok().body("success");
+		return ResponseEntity.created(location).build();
 	}
 
 	@Logging(item = "Post", action = "get")
 	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDetailResponseDto> getDetailPost(@PathVariable(value = "post_id", required = true) Long postId) {
-		PostDetailResponseDto dto = postService.getDetailPost(postId);
+		PostDetailResponseDto dto = postService.getById(postId);
 
 		return ResponseEntity.ok().body(dto);
 	}
@@ -51,7 +53,7 @@ public class PostController {
 			@RequestParam(required = false) List<String> stacks,
 			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
-		PostsResponseDto dto = postService.getPostsByCategory(pageNo, category, stacks);
+		PostsResponseDto dto = postService.getByCategory(pageNo, category, stacks);
 
 		return ResponseEntity.ok().body(dto);
 	}
@@ -63,27 +65,27 @@ public class PostController {
 	public ResponseEntity<PostsResponseDto> getPostsByMyself(@CurrentUser String username,
 	                                                         @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
-		PostsResponseDto dto = postService.getPostsByMyself(username, pageNo);
+		PostsResponseDto dto = postService.getByMyself(username, pageNo);
 
 		return ResponseEntity.ok().body(dto);
 	}
 
 	@Logging(item = "Post", action = "patch")
 	@PatchMapping(consumes = {"application/json", "multipart/form-data"})
-	public ResponseEntity<String> modifyPost(@CurrentUser String username,
+	public ResponseEntity<Void> modifyPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostModifyRequestDto dto,
 	                                         @RequestPart(required = false) @Size(max = 5) @Valid List<MultipartFile> images) {
-		postService.modifyPost(username, dto, images);
+		postService.modify(username, dto, images);
 
-		return ResponseEntity.ok().body("success");
+		return ResponseEntity.noContent().build();
 	}
 
 	@Logging(item = "Post", action = "delete")
 	@DeleteMapping("/{post_id}")
 	public ResponseEntity<String> deletePost(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
-		postService.deletePost(username, postId);
+		postService.deleteById(username, postId);
 
-		return ResponseEntity.ok().body("success");
+		return ResponseEntity.noContent().build();
 	}
 
 	@Logging(item = "Post", action = "post")
@@ -99,6 +101,6 @@ public class PostController {
 	public ResponseEntity<String> deleteHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.deleteHeart(username, postId);
 
-		return ResponseEntity.ok().body("success");
+		return ResponseEntity.noContent().build();
 	}
 }
