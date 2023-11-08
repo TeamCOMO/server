@@ -1,11 +1,8 @@
 package project.como.domain.interest.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import project.como.domain.post.dto.PostDetailResponseDto;
-
-import java.util.List;
 
 @Data
 @Builder

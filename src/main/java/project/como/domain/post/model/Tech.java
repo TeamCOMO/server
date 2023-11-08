@@ -1,15 +1,11 @@
 package project.como.domain.post.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.*;
 
 @Getter

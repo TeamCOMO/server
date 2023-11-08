@@ -5,13 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
-import project.como.domain.post.model.PostState;
-import project.como.domain.post.model.Tech;
 import project.como.domain.user.model.User;
-
-import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 

@@ -1,7 +1,7 @@
 package project.como.domain.comment.service;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,6 @@ import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

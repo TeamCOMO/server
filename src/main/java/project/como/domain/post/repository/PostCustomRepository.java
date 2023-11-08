@@ -5,8 +5,6 @@ import org.springframework.data.domain.Pageable;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostPagingResponseDto;
 import project.como.domain.post.model.Category;
-import project.como.domain.post.model.Post;
-import project.como.domain.post.model.Tech;
 
 import java.util.List;
 

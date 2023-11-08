@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.*;
-import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.model.Comment;
 import project.como.domain.image.model.Image;
 import project.como.domain.user.model.User;
@@ -17,7 +16,6 @@ import project.como.global.common.model.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;

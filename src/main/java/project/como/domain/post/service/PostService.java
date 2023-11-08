@@ -1,12 +1,13 @@
 package project.como.domain.post.service;
 
 import jakarta.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,9 +16,23 @@ import project.como.domain.image.model.Image;
 import project.como.domain.image.repository.ImageRepository;
 import project.como.domain.image.service.ImageService;
 import project.como.domain.interest.repository.InterestRepository;
-import project.como.domain.post.dto.*;
-import project.como.domain.post.exception.*;
-import project.como.domain.post.model.*;
+import project.como.domain.post.dto.PostCreateRequestDto;
+import project.como.domain.post.dto.PostDetailResponseDto;
+import project.como.domain.post.dto.PostModifyRequestDto;
+import project.como.domain.post.dto.PostPagingResponseDto;
+import project.como.domain.post.dto.PostsResponseDto;
+import project.como.domain.post.exception.HeartConflictException;
+import project.como.domain.post.exception.HeartNotFoundException;
+import project.como.domain.post.exception.PostAccessDeniedException;
+import project.como.domain.post.exception.PostImageCountExceededException;
+import project.como.domain.post.exception.PostImageUrlNotFoundException;
+import project.como.domain.post.exception.PostNotFoundException;
+import project.como.domain.post.model.Category;
+import project.como.domain.post.model.Heart;
+import project.como.domain.post.model.Post;
+import project.como.domain.post.model.PostState;
+import project.como.domain.post.model.PostTech;
+import project.como.domain.post.model.Tech;
 import project.como.domain.post.repository.HeartRepository;
 import project.como.domain.post.repository.PostCustomRepository;
 import project.como.domain.post.repository.PostRepository;
@@ -27,10 +42,6 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 import project.como.global.auth.exception.UnauthorizedException;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 @Slf4j
 @Service

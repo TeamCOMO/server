@@ -1,11 +1,14 @@
 package project.como.domain.post.repository;
 
-import com.querydsl.core.BooleanBuilder;
+import static project.como.domain.image.model.QImage.image;
+import static project.como.domain.post.model.QPost.post;
+import static project.como.domain.post.model.QPostTech.postTech;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,20 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import project.como.domain.image.model.Image;
-import project.como.domain.post.dto.*;
+import project.como.domain.post.dto.PostDetailResponseDto;
+import project.como.domain.post.dto.PostPagingResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
-import project.como.domain.post.model.QPost;
-import project.como.domain.post.model.QPostTech;
-import project.como.domain.post.model.Tech;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static project.como.domain.image.model.QImage.*;
-import static project.como.domain.post.model.QPost.*;
-import static project.como.domain.post.model.QPostTech.*;
-import static project.como.domain.post.model.QTech.*;
 
 @Slf4j
 @Repository

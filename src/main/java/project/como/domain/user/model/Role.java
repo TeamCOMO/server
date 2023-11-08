@@ -1,6 +1,5 @@
 package project.como.domain.user.model;
 
-import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
