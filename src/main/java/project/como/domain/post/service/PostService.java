@@ -77,7 +77,7 @@ public class PostService {
 	public void modifyPost(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-		List<Image> imageList = imageService.findImagesByPostId(post.getId());
+		List<String> urlList = imageService.findImagesByPostId(post.getId()).stream().map(Image::getUrl).toList();
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
@@ -104,13 +104,13 @@ public class PostService {
 
 		if (dto.getOldUrls() != null) {
 			for (String oldUrl : dto.getOldUrls())
-				if (!post.getImages().contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
+				if (!urlList.contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
 		}
 
 		int oldSize = 0;
 		if (dto.getOldUrls() != null) oldSize = dto.getOldUrls().size();
 
-		if (images.size() + imageList.size() - oldSize > 5) throw new PostImageCountExceededException();
+		if (images.size() + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
 
 		if (images != null) imageService.uploadImages(username, post, images);
 		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());
