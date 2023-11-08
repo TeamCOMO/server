@@ -14,14 +14,8 @@ import project.como.domain.user.model.User;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-	@Query("SELECT p FROM Post p WHERE (:stacks IS NULL OR :stacks MEMBER OF p.techs) ORDER BY p.createdDate DESC")
-	Page<Post> findAllByOrderByCreatedDateDesc(List<Tech> stacks, Pageable pageable);
 
-	@Query("SELECT p FROM Post p WHERE p.category = :category AND (:stacks IS NULL OR :stacks MEMBER OF p.techs) ORDER BY p.createdDate DESC")
-	Page<Post> findAllByCategoryOrderByCreatedDateDesc(Category category, List<Tech> stacks, Pageable pageable);
-	Page<Post> findAllByCategoryAndStateOrderByCreatedDate(Category category, PostState state, Pageable pageable);
-
-	@Query(value = "SELECT p FROM Post p JOIN FETCH p.techs WHERE p.user = :user ORDER BY p.createdDate DESC",
+	@Query(value = "SELECT p FROM Post p JOIN FETCH p.techList WHERE p.user = :user ORDER BY p.createdDate DESC",
 	countQuery = "SELECT COUNT(p) FROM Post p WHERE p.user = :user")
 	Page<Post> findAllByUserOrderByCreatedDateDesc(@Param("user") User user, Pageable pageable);
 }
