@@ -61,7 +61,7 @@ public class PostService {
 	private final TechRepository techRepository;
 	private final PostTechRepository postTechRepository;
 
-	public void createPost(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
+	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		Post newPost = Post.builder()
@@ -81,10 +81,10 @@ public class PostService {
 
 		if (images != null && !images.isEmpty()) imageService.uploadImages(username, newPost, images);
 
-		postRepository.save(newPost);
+		return postRepository.save(newPost).getId().toString();
 	}
 
-	public void modifyPost(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
+	public void modify(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		List<String> urlList = imageService.findImagesByPostId(post.getId()).stream().map(Image::getUrl).toList();
@@ -123,7 +123,7 @@ public class PostService {
 		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());
 	}
 
-	public void deletePost(String username, Long postId) {
+	public void deleteById(String username, Long postId) {
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
@@ -138,14 +138,14 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
-	public PostDetailResponseDto getDetailPost(Long postId) {
+	public PostDetailResponseDto getById(Long postId) {
 		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId);
 
 		log.info("dto : {}", dto);
 		return dto;
 	}
 
-	public PostsResponseDto getPostsByCategory(int pageNo, String category, List<String> stacks) {
+	public PostsResponseDto getByCategory(int pageNo, String category, List<String> stacks) {
 		Page<PostPagingResponseDto> postPage = postCustomRepository.findAllByCategoryAndTechs(Category.valueOf(category), stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 
 		return PostsResponseDto.builder()
@@ -156,7 +156,7 @@ public class PostService {
 				.build();
 	}
 
-	public PostsResponseDto getPostsByMyself(String username, int pageNo) {
+	public PostsResponseDto getByMyself(String username, int pageNo) {
 		User user = userRepository.findByUsername(username).orElseThrow(UnauthorizedException::new);
 
 		Page<Post> postPage = postRepository.findAllByUserOrderByCreatedDateDesc(user, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
