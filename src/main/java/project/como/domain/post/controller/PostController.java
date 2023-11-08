@@ -22,13 +22,13 @@ import java.util.List;
 @Transactional
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/post")
 public class PostController {
 
 	private final PostService postService;
 
 	@Logging(item = "Post", action = "post")
-	@PostMapping(value = "/post/create", consumes = {"application/json", "multipart/form-data"})
+	@PostMapping(consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> createPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostCreateRequestDto dto,
 	                                         @RequestPart(required = false) @Size(max = 5) @Valid List<MultipartFile> images) {
@@ -38,7 +38,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "get")
-	@GetMapping("/post/{post_id}")
+	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDetailResponseDto> getDetailPost(@PathVariable(value = "post_id", required = true) Long postId) {
 		PostDetailResponseDto dto = postService.getDetailPost(postId);
 
@@ -46,7 +46,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "get")
-	@GetMapping("/posts")
+	@GetMapping
 	public ResponseEntity<PostsResponseDto> getPostsByCategory(@RequestParam(required = false) String category,
 			@RequestParam(required = false) List<String> stacks,
 			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
@@ -59,7 +59,7 @@ public class PostController {
 
 
 	@Logging(item = "Post", action = "get")
-	@GetMapping("/posts/myself")
+	@GetMapping("/myself")
 	public ResponseEntity<PostsResponseDto> getPostsByMyself(@CurrentUser String username,
 	                                                         @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
@@ -69,7 +69,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "patch")
-	@PatchMapping(value = "/post/modify", consumes = {"application/json", "multipart/form-data"})
+	@PatchMapping(consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<String> modifyPost(@CurrentUser String username,
 	                                         @RequestPart @Valid PostModifyRequestDto dto,
 	                                         @RequestPart(required = false) @Size(max = 5) @Valid List<MultipartFile> images) {
@@ -79,7 +79,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "delete")
-	@DeleteMapping("/post/delete/{post_id}")
+	@DeleteMapping("/{post_id}")
 	public ResponseEntity<String> deletePost(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.deletePost(username, postId);
 
@@ -87,7 +87,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "post")
-	@PostMapping("/post/heart/{post_id}")
+	@PostMapping("/heart/{post_id}")
 	public ResponseEntity<String> makeHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.makeHeart(username, postId);
 
@@ -95,7 +95,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "delete")
-	@DeleteMapping("/post/heart/delete/{post_id}")
+	@DeleteMapping("/heart/{post_id}")
 	public ResponseEntity<String> deleteHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.deleteHeart(username, postId);
 
