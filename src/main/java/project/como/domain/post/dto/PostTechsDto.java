@@ -1,7 +1,6 @@
 package project.como.domain.post.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import project.como.domain.post.model.Tech;

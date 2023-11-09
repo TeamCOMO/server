@@ -1,6 +1,5 @@
 package project.como.domain.post.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,9 +19,12 @@ public class Tech {
 	@Id @Column(name = "tech_id")
 	private Long id;
 
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Post post;
+//	@OneToMany(mappedBy = "Tech", cascade = REMOVE)
+//	private List<PostTech> postList = new ArrayList<>();
 
 	private String stack;
+
+//	public void addPost(PostTech post) {
+//		postList.add(post);
+//	}
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import project.como.domain.post.model.Post;
 import project.como.domain.user.model.User;
 
 import static jakarta.persistence.GenerationType.*;

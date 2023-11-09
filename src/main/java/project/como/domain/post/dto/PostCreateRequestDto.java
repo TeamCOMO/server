@@ -2,14 +2,9 @@ package project.como.domain.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
-import project.como.domain.post.model.Category;
-import project.como.domain.post.model.PostState;
-import project.como.domain.post.model.Tech;
-
 import java.util.List;
+import lombok.Data;
+import project.como.domain.post.model.Category;
 
 @Data
 public class PostCreateRequestDto {

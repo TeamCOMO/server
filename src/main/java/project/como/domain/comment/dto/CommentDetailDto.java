@@ -2,7 +2,6 @@ package project.como.domain.comment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import project.como.domain.comment.model.Comment;
 
 import java.util.List;
 
