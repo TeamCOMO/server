@@ -1,5 +1,6 @@
 package project.como.domain.interest.service;
 
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,8 @@ import project.como.domain.interest.model.Interest;
 import project.como.domain.interest.repository.InterestRepository;
 import project.como.domain.post.exception.PostNotFoundException;
 import project.como.domain.post.model.Post;
+import project.como.domain.post.model.PostTech;
+import project.como.domain.post.model.Tech;
 import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
@@ -62,7 +65,7 @@ public class InterestService {
                                 .body(i.getPost().getBody())
                                 .category(i.getPost().getCategory())
                                 .state(i.getPost().getState())
-                                .techs(i.getPost().getTechs())
+                                .techs(getTechList(i.getPost().getTechList()))
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
@@ -81,4 +84,11 @@ public class InterestService {
         return interestRepository.existsByUserAndPost(user, post);
     }
 
+    private List<Tech> getTechList(List<PostTech> techList) {
+        List<Tech> techs = new ArrayList<>();
+        for (PostTech pt : techList) {
+            techs.add(pt.getTech());
+        }
+        return techs;
+    }
 }

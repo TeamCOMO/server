@@ -1,32 +1,47 @@
 package project.como.domain.post.service;
 
 import jakarta.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.repository.CommentRepository;
+import project.como.domain.image.model.Image;
+import project.como.domain.image.repository.ImageRepository;
 import project.como.domain.image.service.ImageService;
 import project.como.domain.interest.repository.InterestRepository;
-import project.como.domain.post.exception.*;
-import project.como.domain.post.model.Heart;
-import project.como.domain.post.repository.HeartRepository;
 import project.como.domain.post.dto.PostCreateRequestDto;
 import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostModifyRequestDto;
+import project.como.domain.post.dto.PostPagingResponseDto;
 import project.como.domain.post.dto.PostsResponseDto;
+import project.como.domain.post.exception.HeartConflictException;
+import project.como.domain.post.exception.HeartNotFoundException;
+import project.como.domain.post.exception.PostAccessDeniedException;
+import project.como.domain.post.exception.PostImageCountExceededException;
+import project.como.domain.post.exception.PostImageUrlNotFoundException;
+import project.como.domain.post.exception.PostNotFoundException;
 import project.como.domain.post.model.Category;
+import project.como.domain.post.model.Heart;
 import project.como.domain.post.model.Post;
 import project.como.domain.post.model.PostState;
+import project.como.domain.post.model.PostTech;
+import project.como.domain.post.model.Tech;
+import project.como.domain.post.repository.HeartRepository;
+import project.como.domain.post.repository.PostCustomRepository;
 import project.como.domain.post.repository.PostRepository;
+import project.como.domain.post.repository.PostTechRepository;
+import project.como.domain.post.repository.TechRepository;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
-import java.util.List;
+import project.como.global.auth.exception.UnauthorizedException;
 
 @Slf4j
 @Service
@@ -37,12 +52,16 @@ public class PostService {
 	private final int TOTAL_ITEMS_PER_PAGE = 20;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
+	private final PostCustomRepository postCustomRepository;
 	private final InterestRepository interestRepository;
 	private final HeartRepository heartRepository;
 	private final CommentRepository commentRepository;
 	private final ImageService imageService;
+	private final ImageRepository imageRepository;
+	private final TechRepository techRepository;
+	private final PostTechRepository postTechRepository;
 
-	public void createPost(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
+	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		Post newPost = Post.builder()
@@ -50,20 +69,25 @@ public class PostService {
 				.body(dto.getBody())
 				.category(dto.getCategory())
 				.state(PostState.Active)
-				.techs(dto.getTechs())
 				.user(user)
 				.readCount(0L)
 				.heartCount(0L)
 				.build();
 
-		if (images != null && !images.isEmpty()) newPost.setImages(imageService.uploadImages(username, images));
+		List<PostTech> mappingList = mappingPostAndTech(newPost, dto.getTechs());
 
-		postRepository.save(newPost);
+		newPost.addTechs(mappingList);
+		postTechRepository.saveAll(mappingList);
+
+		if (images != null && !images.isEmpty()) imageService.uploadImages(username, newPost, images);
+
+		return postRepository.save(newPost).getId().toString();
 	}
 
-	public void modifyPost(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
+	public void modify(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		List<String> urlList = imageService.findImagesByPostId(post.getId()).stream().map(Image::getUrl).toList();
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
@@ -81,27 +105,32 @@ public class PostService {
 			post.modifyState(dto.getState());
 		}
 		if (dto.getTechs() != null) {
-			post.modifyTechs(dto.getTechs());
+			postTechRepository.deleteAllByPostId(post.getId());
+			postTechRepository.saveAll(mappingPostAndTech(post, dto.getTechs()));
 		}
 
 		if (dto.getOldUrls() != null) {
 			for (String oldUrl : dto.getOldUrls())
-				if (!post.getImages().contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
+				if (!urlList.contains(oldUrl)) throw new PostImageUrlNotFoundException(oldUrl);
 		}
 
-		if (images != null) post.setImages(imageService.uploadImages(username, images));
-		if (dto.getOldUrls() != null)
-			post.getImages().removeAll(imageService.deleteImages(dto.getOldUrls()));
+		int oldSize = 0;
+		if (dto.getOldUrls() != null) oldSize = dto.getOldUrls().size();
+
+		if (images.size() + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
+
+		if (images != null) imageService.uploadImages(username, post, images);
+		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());
 	}
 
-	public void deletePost(String username, Long postId) {
+	public void deleteById(String username, Long postId) {
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
 		if (!user.getId().equals(post.getUser().getId()))
 			throw new PostAccessDeniedException();
 
-		imageService.deleteImages(post.getImages());
+		imageService.deleteImages(imageRepository.findAllByPostId(postId).stream().map(Image::getUrl).toList());
 
 		interestRepository.deleteAllByPostId(postId);
 		heartRepository.deleteAllByPostId(postId);
@@ -109,38 +138,40 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
-	public PostDetailResponseDto getDetailPost(Long postId) {
-		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-		post.countRead();
+	public PostDetailResponseDto getById(Long postId) {
+		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId);
 
-		return PostDetailResponseDto.builder()
-				.title(post.getTitle())
-				.imageUrls(post.getImages())
-				.body(post.getBody())
-				.category(post.getCategory())
-				.state(post.getState())
-				.techs(post.getTechs())
-				.heartCount(post.getHeartCount())
-				.build();
+		log.info("dto : {}", dto);
+		return dto;
 	}
 
-	public PostsResponseDto getPostsByCategory(Pageable pageable, int pageNo, String category) {
-		Page<Post> postPage = null;
-		if (category == null) postPage = postRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
-		else postPage = postRepository.findAllByCategoryOrderByCreatedDateDesc(Category.valueOf(category), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+	public PostsResponseDto getByCategory(int pageNo, String category, List<String> stacks) {
+		Page<PostPagingResponseDto> postPage = postCustomRepository.findAllByCategoryAndTechs(Category.valueOf(category), stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
-				.posts(postPage.getContent().stream().map((post) -> PostDetailResponseDto.builder()
-						.id(post.getId())
-						.title(post.getTitle())
-						.body(post.getBody())
-						.category(post.getCategory())
-						.state(post.getState())
-						.techs(post.getTechs())
-						.heartCount(post.getHeartCount())
+				.posts(postPage.getContent())
+				.build();
+	}
+
+	public PostsResponseDto getByMyself(String username, int pageNo) {
+		User user = userRepository.findByUsername(username).orElseThrow(UnauthorizedException::new);
+
+		Page<Post> postPage = postRepository.findAllByUserOrderByCreatedDateDesc(user, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		return PostsResponseDto.builder()
+				.totalPages(postPage.getTotalPages())
+				.totalElements(postPage.getTotalElements())
+				.currentPage(postPage.getNumber())
+				.posts(postPage.stream().map(p -> PostPagingResponseDto.builder()
+						.id(p.getId())
+						.title(p.getTitle())
+						.category(p.getCategory())
+						.state(p.getState())
+						.techs(p.getTechList().stream().distinct().map(pt -> pt.getTech().getStack()).toList())
+						.heartCount(p.getHeartCount())
 						.build()).toList())
 				.build();
 	}
@@ -173,4 +204,23 @@ public class PostService {
 		post.discountHeart();
 	}
 
+	private List<PostTech> mappingPostAndTech(Post post, List<String> techList) {
+		List<PostTech> mappingList = new ArrayList<>();
+
+		for (String stack : techList) {
+			Optional<Tech> tech = techRepository.findByStack(stack);
+			if (tech.isEmpty()) {
+				tech = Optional.of(techRepository.save(Tech.builder().stack(stack).build()));
+			}
+			// 처음에 DB에 주입해줘도 될 거 같은 로직
+
+
+			mappingList.add(PostTech.builder()
+					.post(post)
+					.tech(tech.get())
+					.build());
+		}
+
+		return mappingList;
+	}
 }

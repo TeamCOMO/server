@@ -1,6 +1,7 @@
 package project.como.domain.post.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +9,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.*;
-import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.model.Comment;
+import project.como.domain.image.model.Image;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -26,6 +26,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@BatchSize(size = 1000)
 public class Post extends BaseTimeEntity {
 
 	@GeneratedValue(strategy = IDENTITY)
@@ -44,12 +45,16 @@ public class Post extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	private Category category;
 
-	@Column(nullable = false)
-	@ElementCollection(fetch = FetchType.EAGER)
-	private List<Tech> techs;
+//	@ElementCollection(fetch = FetchType.EAGER)
+//	@Enumerated(EnumType.STRING)
+//	@CollectionTable(name = "post_techs", joinColumns = @JoinColumn(name = "post_post_id"))
+//	private List<Tech> techs;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> images;
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<PostTech> techList = new ArrayList<>();
+
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Image> images;
 
 	@NotBlank
 	private String title;
@@ -69,10 +74,6 @@ public class Post extends BaseTimeEntity {
 		this.body = body;
 	}
 
-	public void modifyTechs(List<Tech> techs) {
-		this.techs = techs;
-	}
-
 	public void modifyCategory(Category category) {
 		this.category = category;
 	}
@@ -88,11 +89,6 @@ public class Post extends BaseTimeEntity {
 	public void countHeart() { ++this.heartCount; }
 	public void discountHeart() { --this.heartCount; }
 
-	public void setImages(List<String> uploadedImages) {
-		if (this.images == null) this.images = new LinkedList<>();
-		images.addAll(uploadedImages);
-	}
-
 	@OneToMany(mappedBy = "post")
 	private Collection<Comment> comment;
 
@@ -102,5 +98,15 @@ public class Post extends BaseTimeEntity {
 
 	public void setComment(Collection<Comment> comment) {
 		this.comment = comment;
+	}
+
+	public void addTech(PostTech tech) {
+		if (techList == null) techList = new ArrayList<>();
+		techList.add(tech);
+	}
+
+	public void addTechs(List<PostTech> techs) {
+		if (techList == null) techList = new ArrayList<>();
+		techList.addAll(techs);
 	}
 }

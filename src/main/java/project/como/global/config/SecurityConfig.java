@@ -1,7 +1,6 @@
 package project.como.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -56,6 +55,7 @@ public class SecurityConfig {
 				.requestMatchers(new AntPathRequestMatcher("/user/check-duplicate/{username}")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/user/current-user")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/api/v1/post")).permitAll()
+				.requestMatchers(new AntPathRequestMatcher("/api/v1/posts")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/HOST/**")).hasRole("어드민")
 				.anyRequest().authenticated()
 				.and()

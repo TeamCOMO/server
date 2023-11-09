@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
 import project.como.domain.interest.dto.InterestResponseDto;
 import project.como.domain.interest.service.InterestService;
-import project.como.domain.post.dto.PostsResponseDto;
-import project.como.domain.post.service.PostService;
 import project.como.global.auth.model.CurrentUser;
 
 @RestController

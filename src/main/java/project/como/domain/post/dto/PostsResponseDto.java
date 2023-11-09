@@ -1,9 +1,7 @@
 package project.como.domain.post.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import project.como.domain.post.model.Post;
 
 import java.util.List;
 
@@ -13,5 +11,5 @@ public class PostsResponseDto {
 	private int totalPages;
 	private long totalElements;
 	private int currentPage;
-	private List<PostDetailResponseDto> posts;
+	private List<PostPagingResponseDto> posts;
 }

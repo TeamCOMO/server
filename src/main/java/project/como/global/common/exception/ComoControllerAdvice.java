@@ -1,26 +1,12 @@
 package project.como.global.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import project.como.domain.comment.exception.CommentForbiddenAccessException;
-import project.como.domain.comment.exception.CommentLevelExceedException;
-import project.como.domain.comment.exception.CommentNotFoundException;
-//import project.como.domain.image.exception.DeleteInvalidImageException;
-import project.como.domain.image.exception.FileDeleteException;
-import project.como.domain.image.exception.FileUploadException;
-import project.como.domain.image.exception.UnsupportedFileExtensionException;
-import project.como.domain.post.exception.*;
-import project.como.domain.user.exception.UserInfoNotFoundException;
-import project.como.domain.user.exception.UserNotEligibleForApplyException;
 import project.como.global.auth.exception.ComoLoginFailureException;
 import project.como.global.common.dto.ErrorResponse;
-import project.como.global.common.dto.ExceptionResponse;
-
-import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
 import static project.como.global.common.exception.ComoException.*;

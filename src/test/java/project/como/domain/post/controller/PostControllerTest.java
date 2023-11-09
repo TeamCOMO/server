@@ -15,12 +15,14 @@ import project.como.domain.post.dto.PostModifyRequestDto;
 import project.como.domain.post.dto.PostsResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
+import project.como.domain.post.model.PostTech;
 import project.como.domain.post.model.Tech;
 import project.como.domain.post.repository.PostRepository;
 import project.como.domain.post.service.PostService;
 import project.como.domain.user.model.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,18 +50,22 @@ class PostControllerTest {
 		dto.setBody("test body");
 		dto.setCategory(Category.Study);
 		dto.setTitle("test title");
-		ArrayList<Tech> techList = new ArrayList<>();
-		techList.add(Tech.Java);
-		techList.add(Tech.Spring);
+		ArrayList<String> techList = new ArrayList<>();
+		techList.add("Java");
+		techList.add("Spring");
 		dto.setTechs(techList);
 
-		postService.createPost(user.getUsername(), dto, null);
+		postService.create(user.getUsername(), dto, null);
 
 		Post post = em.find(Post.class, 1);
 
 		assertThat(post.getTitle()).isEqualTo("test title");
 		assertThat(post.getBody()).isEqualTo("test body");
-		assertThat(post.getTechs()).containsExactly(Tech.Java, Tech.Spring);
+		assertThat(post.getTechList())
+				.allSatisfy(postTech -> {
+					assertThat(postTech.getTech())
+							.isIn("Java", "Spring");
+				});
 	}
 
 	@Test
@@ -69,22 +75,26 @@ class PostControllerTest {
 
 		Post findPost = em.find(Post.class, POST_ID);
 
-		PostDetailResponseDto servicePostDto = postService.getDetailPost(POST_ID);
+		PostDetailResponseDto servicePostDto = postService.getById(POST_ID);
 
 		assertThat(findPost.getTitle()).isEqualTo(servicePostDto.getTitle());
 		assertThat(findPost.getBody()).isEqualTo(servicePostDto.getBody());
 		assertThat(findPost.getCategory()).isEqualTo(servicePostDto.getCategory());
-		assertThat(findPost.getTechs()).containsExactly(Tech.Java, Tech.Spring);
-		assertThat(servicePostDto.getTechs()).containsExactly(Tech.Java, Tech.Spring);
+		assertThat(findPost.getTechList())
+				.allSatisfy(postTech -> {
+					assertThat(postTech.getTech())
+							.isIn("Java", "Spring");
+				});
 	}
 
 	@Test
 	@DisplayName("게시물 카테고리별 조회")
 	void getPostsByCategory() {
 		final String CATEGORY = "Study";
+		final List<String> STACKS = List.of("Java", "Spring");
 		Pageable pageable = PageRequest.of(0, 5);
 
-		PostsResponseDto dto = postService.getPostsByCategory(pageable, 0, CATEGORY);
+		PostsResponseDto dto = postService.getByCategory(0, CATEGORY, STACKS);
 
 		assertThat(dto.getTotalElements()).isEqualTo(3);
 		assertThat(dto.getPosts().get(0).getTitle()).isEqualTo("test title");
@@ -104,7 +114,7 @@ class PostControllerTest {
 		dto.setTitle("change test");
 		dto.setBody("change body");
 
-		postService.modifyPost(USERNAME, dto, null);
+		postService.modify(USERNAME, dto, null);
 
 		Post changedPost = em.find(Post.class, 1);
 
@@ -120,7 +130,7 @@ class PostControllerTest {
 
 		int initSize = postRepository.findAll().size();
 
-		postService.deletePost(USERNAME, POST_ID);
+		postService.deleteById(USERNAME, POST_ID);
 
 		int sizeAfterRemoval = postRepository.findAll().size();
 
