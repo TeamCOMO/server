@@ -5,7 +5,6 @@ import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.PostState;
-import project.como.domain.post.model.Tech;
 
 import java.util.List;
 

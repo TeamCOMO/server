@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.*;
-import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.comment.model.Comment;
 import project.como.domain.image.model.Image;
 import project.como.domain.user.model.User;
@@ -17,7 +16,6 @@ import project.como.global.common.model.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -52,14 +50,11 @@ public class Post extends BaseTimeEntity {
 //	@CollectionTable(name = "post_techs", joinColumns = @JoinColumn(name = "post_post_id"))
 //	private List<Tech> techs;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Tech> techs;
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<PostTech> techList = new ArrayList<>();
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Image> images;
-
-//	@ElementCollection(fetch = FetchType.EAGER)
-//	private List<String> images;
 
 	@NotBlank
 	private String title;
@@ -103,5 +98,15 @@ public class Post extends BaseTimeEntity {
 
 	public void setComment(Collection<Comment> comment) {
 		this.comment = comment;
+	}
+
+	public void addTech(PostTech tech) {
+		if (techList == null) techList = new ArrayList<>();
+		techList.add(tech);
+	}
+
+	public void addTechs(List<PostTech> techs) {
+		if (techList == null) techList = new ArrayList<>();
+		techList.addAll(techs);
 	}
 }

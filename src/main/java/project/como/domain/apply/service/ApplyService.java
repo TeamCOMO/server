@@ -17,8 +17,6 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @Transactional
