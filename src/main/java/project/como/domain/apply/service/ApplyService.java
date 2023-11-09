@@ -47,7 +47,9 @@ public class ApplyService {
 				.post(post)
 				.build();
 
-		return applyRepository.save(application).getId().toString();
+		applyRepository.save(application);
+
+		return post.getId().toString();
 	}
 
 	public boolean check(String username, Long postId) {
