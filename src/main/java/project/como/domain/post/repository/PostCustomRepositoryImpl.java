@@ -30,8 +30,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
 		List<Post> tmp_posts = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
-				.where(categoryEq(category)
-						.and(containsTechs(stacks)))
+				.where(categoryEq(category), containsTechs(stacks))
 				.orderBy(post.createdDate.desc())
 				.fetch();
 
@@ -50,8 +49,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		JPAQuery<Long> countQuery = queryFactory.select(post.count())
 				.from(post)
-				.where(categoryEq(category)
-						.and(containsTechs(stacks)))
+				.where(categoryEq(category), containsTechs(stacks))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize());
 
