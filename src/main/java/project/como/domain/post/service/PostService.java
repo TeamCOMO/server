@@ -146,7 +146,7 @@ public class PostService {
 	}
 
 	public PostsResponseDto getByCategory(int pageNo, String category, List<String> stacks) {
-		Page<PostPagingResponseDto> postPage = postCustomRepository.findAllByCategoryAndTechs(Category.valueOf(category), stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		Page<PostPagingResponseDto> postPage = postCustomRepository.findAllByCategoryAndTechs(category != null ? Category.valueOf(category) : null, stacks, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
