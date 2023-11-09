@@ -89,7 +89,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "post")
-	@PostMapping("/heart/{post_id}")
+	@PostMapping("/{post_id}/heart")
 	public ResponseEntity<String> makeHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.makeHeart(username, postId);
 
@@ -97,7 +97,7 @@ public class PostController {
 	}
 
 	@Logging(item = "Post", action = "delete")
-	@DeleteMapping("/heart/{post_id}")
+	@DeleteMapping("/{post_id}/heart")
 	public ResponseEntity<String> deleteHeart(@CurrentUser String username, @PathVariable(value = "post_id", required = true) Long postId) {
 		postService.deleteHeart(username, postId);
 
