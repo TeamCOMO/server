@@ -94,6 +94,13 @@ public class ApplyService {
 		apply.modifyState(dto.state());
 	}
 
+	@Transactional
+	public void modifyStatesOfPost(Post post) {
+		applyRepository.findAllByPost(post).forEach((apply) -> {
+			apply.modifyState(ApplyState.ON_PROGRESS);
+		});
+	}
+
 	private boolean isNotPostWriter(Long ownerId, Long requesterId) {
 		return !ownerId.equals(requesterId);
 	}
