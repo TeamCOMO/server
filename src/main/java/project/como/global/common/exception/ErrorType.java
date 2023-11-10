@@ -77,7 +77,9 @@ public interface ErrorType {
 		INTEREST_NOT_FOUND(4005),
 		HEART_NOT_FOUND(4006),
 
-		POST_IMAGE_URL_NOT_FOUND(4007)
+		POST_IMAGE_URL_NOT_FOUND(4007),
+
+		APPLY_NOT_FOUND(4008)
 		;
 
 		private final int errorCode;

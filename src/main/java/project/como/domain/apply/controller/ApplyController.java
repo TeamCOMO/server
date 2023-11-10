@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.apply.dto.ApplyListResponseDto;
+import project.como.domain.apply.dto.ApplyStateModifyRequestDto;
 import project.como.domain.apply.service.ApplyService;
 import project.como.global.auth.model.CurrentUser;
 import project.como.global.common.model.Logging;
@@ -38,5 +39,15 @@ public class ApplyController {
 	@GetMapping("/{post_id}")
 	public ResponseEntity<ApplyListResponseDto> getAllByWriter(@CurrentUser String username, @PathVariable(value = "post_id") Long postId) {
 		return ResponseEntity.ok().body(applyService.getAllByWriter(username, postId));
+	}
+
+	@Logging(item = "Apply", action = "Patch")
+	@PatchMapping("/{post_id}")
+	public ResponseEntity<Void> modifyState(@CurrentUser String username,
+											@PathVariable(value = "post_id") Long postId,
+											@RequestBody ApplyStateModifyRequestDto dto) {
+		applyService.modifyState(username, postId, dto);
+
+		return ResponseEntity.noContent().build();
 	}
 }

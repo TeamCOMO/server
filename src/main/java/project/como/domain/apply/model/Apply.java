@@ -28,4 +28,11 @@ public class Apply {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
+
+	@Enumerated(EnumType.STRING)
+	private ApplyState state;
+
+	public void modifyState(ApplyState state) {
+		this.state = state;
+	}
 }
