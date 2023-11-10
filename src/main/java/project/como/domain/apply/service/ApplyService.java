@@ -45,14 +45,15 @@ public class ApplyService {
 			throw new UserInfoNotFoundException();
 		if (post.getState().equals(PostState.Inactive))
 			throw new PostInactiveException();
+		if (applyRepository.findByUser(user).isPresent())
+			throw new DuplicatedApplyException();
 
-		Apply application = Apply.builder()
+		applyRepository.save(
+				Apply.builder()
 				.user(user)
 				.post(post)
 				.state(ApplyState.SUBMIT)
-				.build();
-
-		applyRepository.save(application);
+				.build());
 
 		return post.getId().toString();
 	}
