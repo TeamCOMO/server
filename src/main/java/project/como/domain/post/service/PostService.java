@@ -120,7 +120,10 @@ public class PostService {
 		int oldSize = 0;
 		if (dto.getOldUrls() != null) oldSize = dto.getOldUrls().size();
 
-		if (images.size() + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
+		int imgSize = 0;
+		if (images != null) imgSize = images.size();
+
+		if (imgSize + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
 
 		if (images != null) imageService.uploadImages(username, post, images);
 		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());
