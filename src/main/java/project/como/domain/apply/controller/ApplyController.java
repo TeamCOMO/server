@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.apply.dto.ApplyListResponseDto;
 import project.como.domain.apply.dto.ApplyStateModifyRequestDto;
+import project.como.domain.apply.model.ApplyState;
 import project.como.domain.apply.service.ApplyService;
 import project.como.global.auth.model.CurrentUser;
 import project.como.global.common.model.Logging;
@@ -31,7 +32,7 @@ public class ApplyController {
 
 	@Logging(item = "Apply", action = "Get")
 	@GetMapping("/check/{post_id}")
-	public ResponseEntity<Boolean> getApply(@CurrentUser String username, @PathVariable(value = "post_id") Long postId) {
+	public ResponseEntity<ApplyState> getApply(@CurrentUser String username, @PathVariable(value = "post_id") Long postId) {
 		return ResponseEntity.ok().body(applyService.check(username, postId));
 	}
 

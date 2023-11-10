@@ -2,6 +2,7 @@ package project.como.domain.apply.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import project.como.domain.apply.dto.ApplyListResponseDto;
 import project.como.domain.apply.dto.ApplyStateModifyRequestDto;
 import project.como.domain.apply.dto.ApplyUserResponseDto;
 import project.como.domain.apply.exception.ApplyNotFoundException;
+import project.como.domain.apply.exception.DuplicatedApplyException;
 import project.como.domain.apply.model.Apply;
 import project.como.domain.apply.model.ApplyState;
 import project.como.domain.apply.repository.ApplyRepository;
@@ -58,12 +60,13 @@ public class ApplyService {
 		return post.getId().toString();
 	}
 
-	public boolean check(String username, Long postId) {
+	public ApplyState check(String username, Long postId) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+		Optional<Apply> apply = applyRepository.findApplyByUserAndPost(user, post);
 
-		return applyRepository.findApplyByUserAndPost(user, post).isPresent();
-	}
+        return apply.map(Apply::getState).orElse(null);
+    }
 
 	public ApplyListResponseDto getAllByWriter(String username, Long postId) {
 		User writer = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);

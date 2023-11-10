@@ -14,4 +14,6 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 	Optional<Apply> findApplyByUserAndPost(User user, Post post);
 
 	List<Apply> findAllByPost(Post post);
+
+	Optional<Apply> findByUser(User user);
 }
