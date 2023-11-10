@@ -72,7 +72,7 @@ public class ApplyService {
 		User writer = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-		if (isNotPostWriter(post.getId(), writer.getId())) throw new PostAccessDeniedException();
+		if (isNotPostWriter(post.getUser().getId(), writer.getId())) throw new PostAccessDeniedException();
 
 		List<ApplyUserResponseDto> appliesInfo = new ArrayList<>();
 		for (Apply apply : applyRepository.findAllByPost(post)) {
@@ -80,7 +80,7 @@ public class ApplyService {
 			List<String> portfolio = new ArrayList<>();
 			portfolio.add(user.getBlogUrl());
 			portfolio.add(user.getGithubUrl());
-			appliesInfo.add(ApplyUserResponseDto.of(user.getUsername(), user.getEmail(), portfolio));
+			appliesInfo.add(ApplyUserResponseDto.of(user.getUsername(), user.getEmail(), portfolio, apply.getState()));
 		}
 
 		return ApplyListResponseDto.of(appliesInfo);
@@ -91,7 +91,7 @@ public class ApplyService {
 		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
-		if (isNotPostWriter(post.getId(), user.getId())) throw new PostAccessDeniedException();
+		if (isNotPostWriter(post.getUser().getId(), user.getId())) throw new PostAccessDeniedException();
 
 		User applicant = userRepository.findByUsername(dto.applicantName()).orElseThrow(UserNotFoundException::new);
 		Apply apply = applyRepository.findApplyByUserAndPost(applicant, post).orElseThrow(ApplyNotFoundException::new);
