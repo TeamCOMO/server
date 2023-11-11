@@ -1,5 +1,7 @@
 package project.como.global.config;
 
+import static org.springframework.http.HttpStatus.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,10 +49,10 @@ public class LoggerConfig {
 			if (result instanceof ResponseEntity) {
 				ResponseEntity responseEntity = (ResponseEntity) result;
 
-				if (responseEntity.getStatusCode() == HttpStatus.OK)
+				if (responseEntity.getStatusCode() == OK || responseEntity.getStatusCode() == CREATED || responseEntity.getStatusCode() == NO_CONTENT)
 					customLog.setResult("success");
 				else {
-					HttpStatus status = HttpStatus.valueOf(responseEntity.getStatusCode().value());
+					HttpStatus status = valueOf(responseEntity.getStatusCode().value());
 					customLog.setResult("fail-" + status.getReasonPhrase());
 				}
 			}
