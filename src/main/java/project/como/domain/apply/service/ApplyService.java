@@ -47,7 +47,7 @@ public class ApplyService {
 			throw new UserInfoNotFoundException();
 		if (post.getState().equals(PostState.Inactive))
 			throw new PostInactiveException();
-		if (applyRepository.findByUser(user).isPresent())
+		if (applyRepository.findApplyByUserAndPost(user, post).isPresent())
 			throw new DuplicatedApplyException();
 
 		applyRepository.save(
