@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.como.domain.apply.service.ApplyService;
 import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.image.model.Image;
 import project.como.domain.image.repository.ImageRepository;
@@ -60,6 +61,7 @@ public class PostService {
 	private final ImageRepository imageRepository;
 	private final TechRepository techRepository;
 	private final PostTechRepository postTechRepository;
+	private final ApplyService applyService;
 
 	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -103,6 +105,7 @@ public class PostService {
 		}
 		if (dto.getState() != null) {
 			post.modifyState(dto.getState());
+			applyService.modifyStatesOfPost(post);
 		}
 		if (dto.getTechs() != null) {
 			postTechRepository.deleteAllByPostId(post.getId());
@@ -117,7 +120,10 @@ public class PostService {
 		int oldSize = 0;
 		if (dto.getOldUrls() != null) oldSize = dto.getOldUrls().size();
 
-		if (images.size() + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
+		int imgSize = 0;
+		if (images != null) imgSize = images.size();
+
+		if (imgSize + urlList.size() - oldSize > 5) throw new PostImageCountExceededException();
 
 		if (images != null) imageService.uploadImages(username, post, images);
 		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());

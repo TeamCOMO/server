@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.user.dto.MemberLoginRequestDto;
 import project.como.domain.user.dto.MemberSignupRequestDto;
+import project.como.domain.user.dto.MemberModifyRequestDto;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
@@ -23,11 +24,9 @@ import project.como.global.auth.repository.RefreshTokenRedisRepository;
 import project.como.global.common.dto.ApiResponse;
 import project.como.global.common.model.Helper;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -49,7 +48,6 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.save(dto.toEntity());
 		user.encodePassword(passwordEncoder);
 	}
-
 
 	@Transactional
 	public String signIn(HttpServletRequest request, MemberLoginRequestDto dto) {
@@ -102,5 +100,18 @@ public class UserServiceImpl implements UserService {
 
 	public boolean checkDuplicate(String username) {
 		return userRepository.findByUsername(username).isPresent();
+	}
+
+	@Transactional
+	public void modify(String username, MemberModifyRequestDto dto) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+		if (dto.blog_url() != null) user.setBlogUrl(dto.blog_url());
+		if (dto.github_url() != null) user.setGithubUrl(dto.github_url());
+		if (dto.nickname() != null) user.setNickname(dto.nickname());
+		if (dto.password() != null) {
+			user.setPassword(dto.password());
+			user.encodePassword(passwordEncoder);
+		}
 	}
 }

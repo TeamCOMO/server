@@ -1,6 +1,7 @@
 package project.como.global.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,5 +47,10 @@ public class ComoControllerAdvice {
 	@ExceptionHandler(ServerErrorException.class)
 	public ResponseEntity<ErrorResponse> serverError(ComoException ex) {
 		return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ErrorResponse(ex));
+	}
+
+	@ExceptionHandler(InvalidRequestException.class)
+	public ResponseEntity<ErrorResponse> invalidRequest(ComoException ex) {
+		return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(ex));
 	}
 }
