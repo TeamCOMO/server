@@ -39,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
         Comment findParent = null;
         if(dto.getParentId() != null) {
             findParent = commentRepository.findById(dto.getParentId()).orElseThrow(() -> new CommentNotFoundException(dto.getParentId()));
-
+            System.out.println("댓글 깊이 체크");
             int parentLevel = getParentLevel(findParent);
             if (parentLevel > 3) {
                 throw new CommentLevelExceedException();
@@ -52,14 +52,17 @@ public class CommentServiceImpl implements CommentService {
                 .body(dto.getBody())
                 .parent(findParent)
                 .build();
+        /*if(findParent != null) // 자식 넣기
+            findParent.addChild(comment);*/
 
         commentRepository.save(comment);
         return CommentCreateResponseDto.builder()
                 .id(comment.getId())
+                .parentId(comment.getParent() == null? null : comment.getParent().getId())
                 .build();
     }
 
-    public CommentDetailDto findComment(Long commentId) {
+    public CommentDetailDto get(Long commentId) {
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
 
@@ -69,7 +72,7 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 
-    public CommentResponseDto getById(Long postId) {
+    public CommentResponseDto getListById(Long postId) {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentDetailDto> commentDetailList = buildCommentTree(comments, null);
 
@@ -129,6 +132,7 @@ public class CommentServiceImpl implements CommentService {
     }
     public int getParentLevel(Comment parentComment) {
         int level = 1;
+        System.out.println("댓글 도는 중");
         Comment currentComment = parentComment;
 
         while (currentComment != null) {

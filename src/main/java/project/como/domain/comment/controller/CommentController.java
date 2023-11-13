@@ -31,7 +31,7 @@ public class CommentController {
     //게시물 댓글 목록 조회
     @GetMapping("/post/{post_id}/comments")
     public ResponseEntity<CommentResponseDto> getComments(@PathVariable("post_id") Long postId){
-        CommentResponseDto comments = commentService.getById(postId);
+        CommentResponseDto comments = commentService.getListById(postId);
 
         return ResponseEntity.ok().body(comments);
     }
