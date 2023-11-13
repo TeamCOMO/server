@@ -7,6 +7,7 @@ import static project.como.domain.post.model.QPostTech.postTech;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,14 @@ import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostPagingResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
+import project.como.global.common.model.RedisDao;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PostCustomRepositoryImpl implements PostCustomRepository {
 	private final JPAQueryFactory queryFactory;
+	private final RedisDao redisDao;
 
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
 		List<Post> tmp_posts = queryFactory.selectFrom(post)
@@ -57,14 +60,20 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
-	public PostDetailResponseDto findPostDetailById(Long id) {
+	public PostDetailResponseDto findPostDetailById(Long id, String username) {
 		Post result = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
 				.leftJoin(post.images, image)
 				.where(post.id.eq(id))
 				.fetchOne();
 
-		if (result != null) result.countRead();
+		String redisKey = id.toString();
+		String redisUserKey = username;
+
+		if (!redisDao.getValuesList(redisUserKey).contains(redisKey)) {
+			redisDao.setValuesList(redisUserKey, redisKey);
+			if (result != null) result.countRead();
+		}
 
 		return PostDetailResponseDto.builder()
 				.id(result.getId())

@@ -147,8 +147,8 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
-	public PostDetailResponseDto getById(Long postId) {
-		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId);
+	public PostDetailResponseDto getById(Long postId, String username) {
+		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId, username);
 
 		log.info("dto : {}", dto);
 		return dto;
