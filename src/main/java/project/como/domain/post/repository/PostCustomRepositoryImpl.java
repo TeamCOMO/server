@@ -44,6 +44,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 			dto.setState(post.getState());
 			dto.setTechs(post.getTechList().stream().map((pt) -> pt.getTech().getStack()).toList());
 			dto.setHeartCount(post.getHeartCount());
+			dto.setReadCount(post.getReadCount());
 			return dto;
 		}).toList();
 
@@ -63,6 +64,8 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 				.where(post.id.eq(id))
 				.fetchOne();
 
+		if (result != null) result.countRead();
+
 		return PostDetailResponseDto.builder()
 				.id(result.getId())
 				.title(result.getTitle())
@@ -72,6 +75,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 				.techs(result.getTechList().stream().distinct().map((t) -> t.getTech().getStack()).sorted().toList())
 				.images(result.getImages().stream().map(Image::getUrl).collect(Collectors.toList()))
 				.heartCount(result.getHeartCount())
+				.readCount(result.getReadCount())
 				.build();
 	}
 

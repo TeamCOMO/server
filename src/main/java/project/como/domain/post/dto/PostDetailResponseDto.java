@@ -20,6 +20,7 @@ public class PostDetailResponseDto {
 	private List<String> techs;
 	private List<String> images;
 	private Long heartCount;
+	private Long readCount;
 
 //	public PostDetailResponseDto() {
 //	}

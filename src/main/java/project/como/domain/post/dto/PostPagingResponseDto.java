@@ -20,4 +20,5 @@ public class PostPagingResponseDto {
 	private PostState state;
 	private List<String> techs;
 	private Long heartCount;
+	private Long readCount;
 }
