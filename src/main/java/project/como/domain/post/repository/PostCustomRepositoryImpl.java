@@ -1,5 +1,6 @@
 package project.como.domain.post.repository;
 
+import static java.time.format.DateTimeFormatter.*;
 import static project.como.domain.image.model.QImage.image;
 import static project.como.domain.post.model.QPost.post;
 import static project.como.domain.post.model.QPostTech.postTech;
@@ -7,7 +8,6 @@ import static project.como.domain.post.model.QPostTech.postTech;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +42,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		List<PostPagingResponseDto> content = posts.stream().map(post -> {
 			PostPagingResponseDto dto = new PostPagingResponseDto();
 			dto.setId(post.getId());
+			dto.setCreatedDate(post.getCreatedDate().format(ISO_LOCAL_DATE));
 			dto.setTitle(post.getTitle());
 			dto.setCategory(post.getCategory());
 			dto.setState(post.getState());
@@ -77,6 +78,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		return PostDetailResponseDto.builder()
 				.id(result.getId())
+				.createdDate(result.getCreatedDate().format(ISO_LOCAL_DATE))
 				.title(result.getTitle())
 				.body(result.getBody())
 				.category(result.getCategory())

@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostPagingResponseDto {
 	private Long id;
+	private String createdDate;
 	private String title;
 	private Category category;
 	private PostState state;
