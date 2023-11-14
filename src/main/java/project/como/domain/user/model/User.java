@@ -42,8 +42,7 @@ public class User implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.roles.stream()
-				.map(SimpleGrantedAuthority::new)
-				.collect(Collectors.toList());
+				.map(SimpleGrantedAuthority::new).toList();
 	}
 
 	@Column(nullable = false)
