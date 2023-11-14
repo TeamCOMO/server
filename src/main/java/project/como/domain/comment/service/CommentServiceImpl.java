@@ -1,6 +1,7 @@
 package project.como.domain.comment.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +70,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponseDto findComments(Long postId) {
+        if( postRepository.findById(postId).isEmpty()){
+            throw new PostNotFoundException();
+        }
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentDetailDto> commentDetailList = buildCommentTree(comments, null);
 
