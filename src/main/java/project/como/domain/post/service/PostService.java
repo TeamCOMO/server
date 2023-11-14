@@ -1,6 +1,9 @@
 package project.como.domain.post.service;
 
+import static java.time.format.DateTimeFormatter.*;
+
 import jakarta.annotation.Nullable;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -181,6 +184,8 @@ public class PostService {
 						.state(p.getState())
 						.techs(p.getTechList().stream().distinct().map(pt -> pt.getTech().getStack()).toList())
 						.heartCount(p.getHeartCount())
+						.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
+						.readCount(p.getReadCount())
 						.build()).toList())
 				.build();
 	}
