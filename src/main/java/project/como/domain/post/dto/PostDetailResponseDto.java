@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDetailResponseDto {
 	private Long id;
+	private String createdDate;
 	private String title;
 	private String body;
 	private Category category;
@@ -20,6 +21,7 @@ public class PostDetailResponseDto {
 	private List<String> techs;
 	private List<String> images;
 	private Long heartCount;
+	private Long readCount;
 
 //	public PostDetailResponseDto() {
 //	}
