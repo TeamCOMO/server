@@ -60,6 +60,7 @@ public class Post extends BaseTimeEntity {
 	private String title;
 
 	@NotBlank
+	@Column(columnDefinition = "TEXT")
 	private String body;
 
 	private Long readCount;

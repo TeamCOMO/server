@@ -1,5 +1,6 @@
 package project.como.domain.post.repository;
 
+import static java.time.format.DateTimeFormatter.*;
 import static project.como.domain.image.model.QImage.image;
 import static project.como.domain.post.model.QPost.post;
 import static project.como.domain.post.model.QPostTech.postTech;
@@ -20,12 +21,14 @@ import project.como.domain.post.dto.PostDetailResponseDto;
 import project.como.domain.post.dto.PostPagingResponseDto;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
+import project.como.global.common.model.RedisDao;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PostCustomRepositoryImpl implements PostCustomRepository {
 	private final JPAQueryFactory queryFactory;
+	private final RedisDao redisDao;
 
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
 		List<Post> tmp_posts = queryFactory.selectFrom(post)
@@ -39,11 +42,13 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		List<PostPagingResponseDto> content = posts.stream().map(post -> {
 			PostPagingResponseDto dto = new PostPagingResponseDto();
 			dto.setId(post.getId());
+			dto.setCreatedDate(post.getCreatedDate().format(ISO_LOCAL_DATE));
 			dto.setTitle(post.getTitle());
 			dto.setCategory(post.getCategory());
 			dto.setState(post.getState());
 			dto.setTechs(post.getTechList().stream().map((pt) -> pt.getTech().getStack()).toList());
 			dto.setHeartCount(post.getHeartCount());
+			dto.setReadCount(post.getReadCount());
 			return dto;
 		}).toList();
 
@@ -56,15 +61,24 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
-	public PostDetailResponseDto findPostDetailById(Long id) {
+	public PostDetailResponseDto findPostDetailById(Long id, String username) {
 		Post result = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
 				.leftJoin(post.images, image)
 				.where(post.id.eq(id))
 				.fetchOne();
 
+		String redisKey = id.toString();
+		String redisUserKey = username;
+
+		if (!redisDao.getValuesList(redisUserKey).contains(redisKey)) {
+			redisDao.setValuesList(redisUserKey, redisKey);
+			if (result != null) result.countRead();
+		}
+
 		return PostDetailResponseDto.builder()
 				.id(result.getId())
+				.createdDate(result.getCreatedDate().format(ISO_LOCAL_DATE))
 				.title(result.getTitle())
 				.body(result.getBody())
 				.category(result.getCategory())
@@ -72,6 +86,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 				.techs(result.getTechList().stream().distinct().map((t) -> t.getTech().getStack()).sorted().toList())
 				.images(result.getImages().stream().map(Image::getUrl).collect(Collectors.toList()))
 				.heartCount(result.getHeartCount())
+				.readCount(result.getReadCount())
 				.build();
 	}
 
