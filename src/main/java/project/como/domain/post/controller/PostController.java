@@ -41,8 +41,9 @@ public class PostController {
 
 	@Logging(item = "Post", action = "get")
 	@GetMapping("/{post_id}")
-	public ResponseEntity<PostDetailResponseDto> getDetailPost(@PathVariable(value = "post_id", required = true) Long postId) {
-		PostDetailResponseDto dto = postService.getById(postId);
+	public ResponseEntity<PostDetailResponseDto> getDetailPost(@CurrentUser String username,
+															   @PathVariable(value = "post_id", required = true) Long postId) {
+		PostDetailResponseDto dto = postService.getById(postId, username);
 
 		return ResponseEntity.ok().body(dto);
 	}

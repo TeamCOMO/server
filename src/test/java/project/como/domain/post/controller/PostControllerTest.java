@@ -72,10 +72,11 @@ class PostControllerTest {
 	@DisplayName("게시물 단건 조회")
 	void getDetailPost() {
 		final Long POST_ID = 1L;
+		final String USERNAME = "smc9919";
 
 		Post findPost = em.find(Post.class, POST_ID);
 
-		PostDetailResponseDto servicePostDto = postService.getById(POST_ID);
+		PostDetailResponseDto servicePostDto = postService.getById(POST_ID, USERNAME);
 
 		assertThat(findPost.getTitle()).isEqualTo(servicePostDto.getTitle());
 		assertThat(findPost.getBody()).isEqualTo(servicePostDto.getBody());

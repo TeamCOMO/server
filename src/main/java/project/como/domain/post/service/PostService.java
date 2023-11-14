@@ -63,6 +63,7 @@ public class PostService {
 	private final PostTechRepository postTechRepository;
 	private final ApplyService applyService;
 
+	@Transactional
 	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
@@ -86,6 +87,7 @@ public class PostService {
 		return postRepository.save(newPost).getId().toString();
 	}
 
+	@Transactional
 	public void modify(String username, PostModifyRequestDto dto, List<MultipartFile> images) {
 		Post post = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -129,6 +131,7 @@ public class PostService {
 		if (dto.getOldUrls() != null) imageService.deleteImages(dto.getOldUrls());
 	}
 
+	@Transactional
 	public void deleteById(String username, Long postId) {
 		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -144,8 +147,8 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
-	public PostDetailResponseDto getById(Long postId) {
-		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId);
+	public PostDetailResponseDto getById(Long postId, String username) {
+		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId, username);
 
 		log.info("dto : {}", dto);
 		return dto;
