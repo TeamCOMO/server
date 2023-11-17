@@ -4,7 +4,7 @@
 | :---------:|:----------:|
 |<img width="300" alt="image" src="https://avatars.githubusercontent.com/u/48898994?s=400&u=7ced4be7b2af430c876d1453fa5f4f028a9902f9&v=4"> | <img width="300"  alt="image" src="https://avatars.githubusercontent.com/u/54787442?v=4"> | 
 | [its-sky](https://github.com/its-sky) | [Kimseungin0529](https://github.com/Kimseungin0529) |
-| AWS 인프라 구축(EC2, HTTPS, RDS, S3)</br>유저 로그인(JWT), 게시물, 이미지, 지원 API 구현</br>테스트 코드 작성  | 관심, 댓글 API 구현, 테스트코드 작성 |
+| AWS 인프라 구축(EC2, HTTPS, RDS, S3)</br>유저 로그인(JWT), 게시물, 이미지, 지원 API 구현</br> DB 설계, 테스트 코드 작성  | DB 설계, 관심, 댓글 API 구현, 테스트코드 작성 |
 
 <hr>
 
