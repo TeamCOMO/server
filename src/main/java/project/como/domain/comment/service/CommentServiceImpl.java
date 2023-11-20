@@ -40,7 +40,6 @@ public class CommentServiceImpl implements CommentService {
         Comment findParent = null;
         if(dto.getParentId() != null) {
             findParent = commentRepository.findById(dto.getParentId()).orElseThrow(() -> new CommentNotFoundException(dto.getParentId()));
-            System.out.println("댓글 깊이 체크");
             int parentLevel = getParentLevel(findParent);
             if (parentLevel > 3) {
                 throw new CommentLevelExceedException();
@@ -135,7 +134,6 @@ public class CommentServiceImpl implements CommentService {
     }
     public int getParentLevel(Comment parentComment) {
         int level = 1;
-        System.out.println("댓글 도는 중");
         Comment currentComment = parentComment;
 
         while (currentComment != null) {

@@ -23,9 +23,9 @@ public class CommentController {
     @PostMapping("/post/{post_id}/comment")
     public ResponseEntity<CommentCreateResponseDto> createComment(@PathVariable("post_id") Long postId
             , @RequestBody @Valid CommentCreateRequestDto dto, @CurrentUser String username) { //@CurrentUser를 통해 인증된 username 가져옴
-        CommentCreateResponseDto commendDto = commentService.create(username, postId, dto);
+        CommentCreateResponseDto commentDto = commentService.create(username, postId, dto);
 
-        return ResponseEntity.ok().body(commendDto);
+        return ResponseEntity.ok().body(commentDto);
     }
 
     //게시물 댓글 목록 조회

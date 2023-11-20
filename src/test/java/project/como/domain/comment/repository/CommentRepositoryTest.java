@@ -64,9 +64,8 @@ class CommentRepositoryTest {
     }
     @AfterEach
     void close(){
-        postRepository.delete(post1); // 만약 운영 DB를 사용한다면 deletAll을 하면 안됨?
-        postRepository.delete(post2);
-        userRepository.delete(user);
+        postRepository.deleteAll();
+        userRepository.deleteAll();
     }
     @Test
     @DisplayName("해당 게시물에 작성된 댓글들만 가져온다.")

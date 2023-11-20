@@ -74,8 +74,8 @@ public class CommentServiceTest {
     }
     @AfterAll
     public void close(){
-        postRepository.deleteById(postId);
-        userRepository.delete(user);
+        postRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Transactional
