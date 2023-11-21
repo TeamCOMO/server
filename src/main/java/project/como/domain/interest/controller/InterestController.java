@@ -1,6 +1,8 @@
 package project.como.domain.interest.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +18,16 @@ public class InterestController {
     private final InterestService interestService;
 
     //관심 등록
-    @PostMapping("/interest")
+    @PostMapping("/post/interest")
     public ResponseEntity<String> registryInterest(@CurrentUser String username,
-                                                   @RequestBody InterestCreateRequestDto dto){
+                                                   @RequestBody @Valid InterestCreateRequestDto dto){
         interestService.createInterest(username, dto);
         return ResponseEntity.ok().body("success");
     }
 
     //단일 관심 조회는 필요 없어 보여서 만들지 않음.
     //관심 조회 : 해당 유저의 관심 게시물을 전부 반환(조건 : 해당 유저에 대한 인증)
-    @GetMapping("/posts/interest")
+    @GetMapping("/post/interest")
     private ResponseEntity<InterestResponseDto> getInterestPosts(@CurrentUser String username,
                                                                  @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
                                                                  Pageable pageable){
@@ -35,7 +37,7 @@ public class InterestController {
     }
 
     //관심 삭제
-    @DeleteMapping("/interest/{interest_id}")
+    @DeleteMapping("/post/interest/{interest_id}")
     public ResponseEntity<String> deleteInterest(@PathVariable(name = "interest_id") Long interestId,
                                                  @CurrentUser String username){
         interestService.deleteInterest(interestId, username);
