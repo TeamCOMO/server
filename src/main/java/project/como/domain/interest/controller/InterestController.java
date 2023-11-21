@@ -3,6 +3,7 @@ package project.como.domain.interest.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +30,10 @@ public class InterestController {
     //관심 조회 : 해당 유저의 관심 게시물을 전부 반환(조건 : 해당 유저에 대한 인증)
     @GetMapping("/post/interest")
     private ResponseEntity<InterestResponseDto> getInterestPosts(@CurrentUser String username,
-                                                                 @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
-                                                                 Pageable pageable){
+                                                                 @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo
+                                                                 ){
         pageNo = (pageNo == 0) ? 0 : (pageNo - 1); //실제로 처리될 때는 시작 번호가 0이므로 클라이언트에서 받은 pageNo에서 1을 빼줌
-        InterestResponseDto interests = interestService.findInterests(username, pageNo, pageable);
+        InterestResponseDto interests = interestService.findInterests(username, pageNo);
         return ResponseEntity.ok().body(interests);
     }
 
