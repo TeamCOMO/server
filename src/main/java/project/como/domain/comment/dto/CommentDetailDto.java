@@ -19,6 +19,7 @@ public class  CommentDetailDto {
 
     private String nickname;
 
+    private String createdTime;
 
     private List<CommentDetailDto> children;
 
