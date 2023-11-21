@@ -130,6 +130,7 @@ public class CommentServiceImpl implements CommentService {
                         .id(comment.getId())
                         .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
                         .body(comment.getBody())
+                        .nickname(comment.getUser().getNickname())
                         .children(buildCommentTree(comments, comment))
                         .build())
                 .collect(Collectors.toList());
