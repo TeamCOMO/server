@@ -9,18 +9,22 @@ import project.como.domain.interest.dto.InterestResponseDto;
 import project.como.domain.interest.service.InterestService;
 import project.como.global.auth.model.CurrentUser;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class InterestController {
     private final InterestService interestService;
+    private final String INTEREST_API_ENDPOINT =   "/api/v1/post/interest";
 
     //관심 등록
     @PostMapping("/post/interest")
     public ResponseEntity<String> registryInterest(@CurrentUser String username,
                                                    @RequestBody @Valid InterestCreateRequestDto dto){
         interestService.createInterest(username, dto);
-        return ResponseEntity.ok().body("success");
+        URI location = URI.create(INTEREST_API_ENDPOINT);
+        return ResponseEntity.created(location).build();
     }
 
     //단일 관심 조회는 필요 없어 보여서 만들지 않음.
