@@ -17,6 +17,9 @@ public class  CommentDetailDto {
     @NotBlank
     private String body;
 
+    private String nickname;
+
+
     private List<CommentDetailDto> children;
 
 
