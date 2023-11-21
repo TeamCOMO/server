@@ -22,6 +22,8 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -132,6 +134,7 @@ public class CommentServiceImpl implements CommentService {
                         .body(comment.getBody())
                         .nickname(comment.getUser().getNickname())
                         .children(buildCommentTree(comments, comment))
+                        .createdTime(comment.getCreatedDate().format(ISO_LOCAL_DATE))
                         .build())
                 .collect(Collectors.toList());
     }
