@@ -56,6 +56,7 @@ public class SecurityConfig {
 				.requestMatchers(new AntPathRequestMatcher("/user/current-user")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/api/v1/post")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/api/v1/posts")).permitAll()
+				.requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/HOST/**")).hasRole("어드민")
 				.anyRequest().authenticated()
 				.and()
