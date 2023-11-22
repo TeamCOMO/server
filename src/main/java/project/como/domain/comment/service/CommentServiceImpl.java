@@ -45,16 +45,17 @@ public class CommentServiceImpl implements CommentService {
                 throw new CommentLevelExceedException();
             }
         }
-
         Comment comment = Comment.builder()
                 .user(findUser)
                 .post(findPost)
                 .body(dto.getBody())
                 .parent(findParent)
                 .build();
-        /*if(findParent != null) // 자식 넣기
-            findParent.addChild(comment);*/
 
+
+        if(findParent != null) { // 자식 넣기
+            findParent.addChild(comment);
+        }
         commentRepository.save(comment);
         return CommentCreateResponseDto.builder()
                 .id(comment.getId())

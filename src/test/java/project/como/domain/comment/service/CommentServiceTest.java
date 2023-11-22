@@ -22,22 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-/**
- * (생성)
- * 일반적으로 댓글이 생성이 되는지 - 성공
- * 대댓글 작성이 잘 되는지 - 성공
- * 대댓글 제한 레벨 3을 넘으면 예외처리가 되는지 - 성공
- *
- * (삭제)
- *  댓글 단건 삭제 -성공
- *  댓글 삭제 시, 하위(자식) 댓글도 삭제된다. -> 이상하게 test에서만 참조 문제로 - 실패
- *  댓글 삭제는 게시물 작성자와 댓글 작성자만 삭제할 수 있다. - 성공
- * (조회)
- *
- *
- * (수정)
- * 입력한 값으로 댓글 내용이 바뀐다 -> 댓글 작성자만이 댓글 수정 권한을 가지므로 이는 단위 테스에서 체크하자. - 성공
- */
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 public class CommentServiceTest {
@@ -151,10 +136,6 @@ public class CommentServiceTest {
                 );
     }
 
-    /**
-     * test 실패
-     * 원인 ->
-     */
     @Transactional
     @Test
     @DisplayName("대댓글 구조는 최대 3입니다.")
@@ -184,9 +165,7 @@ public class CommentServiceTest {
         assertThatThrownBy(() -> commentService.create(username, postId, request))
                 .isInstanceOf(CommentLevelExceedException.class);
                 //.hasMessage("대댓글 깊이는 최대 3입니다. 해당 댓글에 대댓글을 작성할 수 없습니다.");
-        /**
-         * 이 친구도 message 값이 null이라고 나옴...
-         */
+
     }
 
     @Transactional
@@ -214,9 +193,8 @@ public class CommentServiceTest {
                 .contains("댓글1", "대댓글1");
     }
 
-    //@Transactional
-    //@Test // 삭제 시, 참조 문제(로그 보면 parent, children 중 parent로 추정됨)로 인해 삭제가 되지 않는다.
-    // api 호출 시에는 orphanRemoval로 잘 삭제가 되는 거 같은데 test에서는 되지 않는다.
+    @Transactional
+    @Test
     @DisplayName("댓글 삭제 시, 댓글에 대한 대댓글도 삭제된다.")
     void deleteCommentWithReplies(){
         //given
@@ -344,9 +322,6 @@ public class CommentServiceTest {
         assertThatThrownBy(() -> commentService.modifyById(savedOther.getUsername(), comment2.getId(), dto))
                 .isInstanceOf(CommentForbiddenAccessException.class);
                 //.hasMessage("해당 사용자는 댓글 수정 또는 삭제 불가합니다.");
-        /**
-         * 원인을 찾지 못함. 실제로 의도대로 예외를 발생한 경우에는 예외에 대한 message도 나오지만 test에서는 null으로 반환된다. 일단 넘어가자.
-         */
     }
 
     private static User createUser(String username, String email, String password, String nickname) {
@@ -367,11 +342,13 @@ public class CommentServiceTest {
                 .build();
     }
     private static Comment createChildComment(Post post, User user, String body, Comment parent) {
-        return Comment.builder()
+        Comment childComment = Comment.builder()
                 .user(user)
                 .post(post)
                 .parent(parent)
                 .body(body)
                 .build();
+        parent.addChild(childComment);
+        return childComment;
     }
 }
