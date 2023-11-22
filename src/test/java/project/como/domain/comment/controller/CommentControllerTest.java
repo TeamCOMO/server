@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
+import project.como.domain.comment.dto.CommentCreateResponseDto;
 import project.como.domain.comment.service.CommentService;
 import project.como.domain.post.model.Category;
 import project.como.domain.post.model.Post;
@@ -56,6 +57,13 @@ class CommentControllerTest {
         CommentCreateRequestDto request = CommentCreateRequestDto.builder()
                 .body("댓글입니다!")
                 .build();
+        BDDMockito.given(commentService.create("user",9999L,request))
+                        .willReturn(
+                                CommentCreateResponseDto.builder()
+                                        .parentId(request.getParentId())
+                                        .id(2162L)
+                                        .build()
+                        );
 
         //when //then
         mockMvc.perform(
@@ -65,9 +73,9 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-                //.andExpect(MockMvcResultMatchers.jsonPath("$.parentId").isEmpty())
-                //.andExpect(MockMvcResultMatchers.jsonPath("$.id").exists()); // test 상에서만 responseDto가 null로 나옴. 해당 문제 추후 해결
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parentId").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists()); // test 상에서만 responseDto가 null로 나옴. 해당 문제 추후 해결
     }
 
 }
