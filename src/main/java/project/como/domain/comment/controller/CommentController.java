@@ -12,7 +12,7 @@ import project.como.domain.comment.dto.CommentResponseDto;
 import project.como.domain.comment.service.CommentService;
 import project.como.global.auth.model.CurrentUser;
 
-@RestController @Slf4j
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/")
 public class CommentController {
@@ -25,8 +25,7 @@ public class CommentController {
     public ResponseEntity<CommentCreateResponseDto> createComment(@PathVariable("post_id") Long postId
             , @RequestBody @Valid CommentCreateRequestDto dto, @CurrentUser String username) { //@CurrentUser를 통해 인증된 username 가져옴
         CommentCreateResponseDto commentDto = commentService.create(username, postId, dto);
-        //log.info("dto = {}", commentDto.getId());
-        //log.info("dto = {}", commentDto.getParentId());
+
         return ResponseEntity.ok().body(commentDto);
     }
 
