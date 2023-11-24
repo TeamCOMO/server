@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
                 .body(dto.getBody())
                 .parent(findParent)
                 .build();
-
+        comment.settingPost(findPost);
 
         if(findParent != null) { // 자식 넣기
             findParent.addChild(comment);
