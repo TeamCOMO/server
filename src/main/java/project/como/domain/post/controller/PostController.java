@@ -71,6 +71,15 @@ public class PostController {
 		return ResponseEntity.ok().body(dto);
 	}
 
+	@GetMapping("/write/comment") // URI 가 Restful한가? -> 그건 아닌 거 같음. 일단 기능 구현 후, 고려
+	public ResponseEntity<PostsResponseDto> getPostsByMyComments(@CurrentUser String username,
+																 @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo){
+		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
+		PostsResponseDto dto = postService.getByMyComments(username, pageNo);
+
+		return ResponseEntity.ok().body(dto);
+	}
+
 	@Logging(item = "Post", action = "patch")
 	@PatchMapping(consumes = {"application/json", "multipart/form-data"})
 	public ResponseEntity<Void> modifyPost(@CurrentUser String username,

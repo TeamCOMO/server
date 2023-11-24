@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import project.como.domain.post.model.Post;
+import project.como.domain.post.repository.PostRepository;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
 
@@ -48,6 +49,9 @@ public class Comment extends BaseTimeEntity {
 
 	public void addChild(Comment comment){
 		this.children.add(comment);
+	}
+	public void addPost(Post post){
+
 	}
 
 
