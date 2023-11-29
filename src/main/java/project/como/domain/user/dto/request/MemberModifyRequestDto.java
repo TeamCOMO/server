@@ -1,4 +1,4 @@
-package project.como.domain.user.dto;
+package project.como.domain.user.dto.request;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Pattern;

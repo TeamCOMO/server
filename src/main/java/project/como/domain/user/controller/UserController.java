@@ -7,9 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.como.domain.user.dto.MemberLoginRequestDto;
-import project.como.domain.user.dto.MemberSignupRequestDto;
-import project.como.domain.user.dto.MemberModifyRequestDto;
+import project.como.domain.user.dto.request.MemberLoginRequestDto;
+import project.como.domain.user.dto.request.MemberSignupRequestDto;
+import project.como.domain.user.dto.request.MemberModifyRequestDto;
+import project.como.domain.user.dto.response.UserMypageResponseDto;
 import project.como.domain.user.service.CustomUserDetailsService;
 import project.como.domain.user.service.UserService;
 import project.como.global.auth.model.CurrentUser;
@@ -60,6 +61,12 @@ public class UserController {
 		userService.modify(username, dto);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@Logging(item = "User", action = "Get")
+	@GetMapping("/my-page")
+	public ResponseEntity<UserMypageResponseDto> myPage(@CurrentUser String username) {
+		return ResponseEntity.ok().body(userService.myPage(username));
 	}
 
 	@Logging(item = "Ping", action = "get")

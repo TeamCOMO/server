@@ -11,9 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.como.domain.user.dto.MemberLoginRequestDto;
-import project.como.domain.user.dto.MemberSignupRequestDto;
-import project.como.domain.user.dto.MemberModifyRequestDto;
+import project.como.domain.user.dto.request.MemberLoginRequestDto;
+import project.como.domain.user.dto.request.MemberSignupRequestDto;
+import project.como.domain.user.dto.request.MemberModifyRequestDto;
+import project.como.domain.user.dto.response.UserMypageResponseDto;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
@@ -113,5 +114,10 @@ public class UserServiceImpl implements UserService {
 			user.setPassword(dto.password());
 			user.encodePassword(passwordEncoder);
 		}
+	}
+
+	public UserMypageResponseDto myPage(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		return UserMypageResponseDto.of(user);
 	}
 }
