@@ -178,6 +178,7 @@ public class PostService {
 				.currentPage(postPage.getNumber())
 				.posts(postPage.stream().map(p -> PostPagingResponseDto.builder()
 						.id(p.getId())
+						.nickname(user.getNickname())
 						.title(p.getTitle())
 						.category(p.getCategory())
 						.state(p.getState())
