@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.comment.dto.CommentCreateRequestDto;
+import project.como.domain.comment.dto.CommentCreateResponseDto;
 import project.como.domain.comment.dto.CommentDetailDto;
 import project.como.domain.comment.dto.CommentResponseDto;
 import project.como.domain.comment.exception.CommentForbiddenAccessException;
@@ -34,33 +35,37 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    @Override
-    public void writeComment(String username, Long postId, CommentCreateRequestDto dto) {
+    public CommentCreateResponseDto create(String username, Long postId, CommentCreateRequestDto dto) {
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         Comment findParent = null;
         if(dto.getParentId() != null) {
             findParent = commentRepository.findById(dto.getParentId()).orElseThrow(() -> new CommentNotFoundException(dto.getParentId()));
-
             int parentLevel = getParentLevel(findParent);
             if (parentLevel > 3) {
                 throw new CommentLevelExceedException();
             }
         }
-
         Comment comment = Comment.builder()
                 .user(findUser)
                 .post(findPost)
                 .body(dto.getBody())
                 .parent(findParent)
                 .build();
+        comment.settingPost(findPost);
 
+        if(findParent != null) { // 자식 넣기
+            findParent.addChild(comment);
+        }
         commentRepository.save(comment);
+        return CommentCreateResponseDto.builder()
+                .id(comment.getId())
+                .parentId(comment.getParent() == null? null : comment.getParent().getId())
+                .build();
     }
 
-    @Override
-    public CommentDetailDto findComment(Long commentId) {
+    public CommentDetailDto get(Long commentId) {
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
 
@@ -70,11 +75,9 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 
-    @Override
-    public CommentResponseDto findComments(Long postId) {
-        if( postRepository.findById(postId).isEmpty()){
-            throw new PostNotFoundException();
-        }
+
+    public CommentResponseDto getListById(Long postId) {
+
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentDetailDto> commentDetailList = buildCommentTree(comments, null);
 
@@ -84,8 +87,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional
-    @Override
-    public void updateComment(String username, Long commentId, CommentDetailDto dto) {
+    public void modifyById(String username, Long commentId, CommentDetailDto dto) {
         User findUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
@@ -98,8 +100,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional
-    @Override
-    public void deleteComment(String username, Long commentId) {
+    public void deleteById(String username, Long commentId) {
         User findUser = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
@@ -111,13 +112,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     // 댓글 권한 체크 로직 //
-    @Override
     public boolean checkUpdate(User user, Comment comment) {
         //접근하는 사용자가 댓글을 작성한 사용자 맞는지
         return user.getId().equals(comment.getUser().getId());
     }
 
-    @Override
     public boolean checkDelete(User user, Comment comment) {
         //댓글 작성자만 해당 댓글 삭제 가능 || 게시물 작성자는 모든 댓글을 삭제 가능
         return checkUpdate(user, comment) || user.getId().equals(comment.getPost().getUser().getId());

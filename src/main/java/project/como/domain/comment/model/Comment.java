@@ -3,6 +3,7 @@ package project.como.domain.comment.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import project.como.domain.post.model.Post;
 import project.como.domain.user.model.User;
 import project.como.global.common.model.BaseTimeEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 @Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@BatchSize(size = 1000)
 public class Comment extends BaseTimeEntity {
 
 	@Id
@@ -45,5 +47,13 @@ public class Comment extends BaseTimeEntity {
 	public void updateBody (String body){
 		this.body = body;
 	}
+
+	public void addChild(Comment comment){
+		this.children.add(comment);
+	}
+	public void settingPost(Post post){
+		post.getComment().add(this);
+	}
+
 
 }
