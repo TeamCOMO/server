@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.como.domain.apply.model.Apply;
+import project.como.domain.apply.repository.ApplyRepository;
 import project.como.domain.apply.service.ApplyService;
 import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.image.model.Image;
@@ -65,6 +67,7 @@ public class PostService {
 	private final TechRepository techRepository;
 	private final PostTechRepository postTechRepository;
 	private final ApplyService applyService;
+	private final ApplyRepository applyRepository;
 
 	@Transactional
 	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
@@ -187,6 +190,32 @@ public class PostService {
 						.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
 						.readCount(p.getReadCount())
 						.build()).toList())
+				.build();
+	}
+
+	public PostsResponseDto getByApply(String username, int pageNo) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+		Page<Apply> applies = applyRepository.findAllByUser(user, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		return PostsResponseDto.builder()
+				.totalPages(applies.getTotalPages())
+				.totalElements(applies.getTotalElements())
+				.currentPage(applies.getNumber())
+				.posts(applies.stream().map(a -> {
+					Post post = a.getPost();
+					return PostPagingResponseDto.builder()
+							.id(post.getId())
+							.nickname(post.getUser().getNickname())
+							.title(post.getTitle())
+							.category(post.getCategory())
+							.state(post.getState())
+							.techs(post.getTechList().stream().distinct().map(pt -> pt.getTech().getStack()).toList())
+							.heartCount(post.getHeartCount())
+							.readCount(post.getReadCount())
+							.createdDate(post.getCreatedDate().format(ISO_LOCAL_DATE))
+							.build();
+                }).toList())
 				.build();
 	}
 
