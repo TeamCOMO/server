@@ -19,7 +19,7 @@ public class InterestController {
     private final String INTEREST_API_ENDPOINT =   "/api/v1/post/interest";
 
     //관심 등록
-    @PostMapping("/post/interest")
+    @PostMapping("/interest")
     public ResponseEntity<String> registryInterest(@CurrentUser String username,
                                                    @RequestBody @Valid InterestCreateRequestDto dto){
         interestService.createInterest(username, dto);
@@ -29,7 +29,7 @@ public class InterestController {
 
     //단일 관심 조회는 필요 없어 보여서 만들지 않음.
     //관심 조회 : 해당 유저의 관심 게시물을 전부 반환(조건 : 해당 유저에 대한 인증)
-    @GetMapping("/post/interest")
+    @GetMapping("/interest")
     private ResponseEntity<InterestResponseDto> getInterestPosts(@CurrentUser String username,
                                                                  @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo
                                                                  ){
