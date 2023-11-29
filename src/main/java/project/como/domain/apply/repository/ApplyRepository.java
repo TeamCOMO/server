@@ -21,6 +21,10 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
 	Optional<Apply> findByUser(User user);
 
+	@Query(value = "SELECT a FROM Apply a JOIN FETCH a.post WHERE a.post = :post ORDER BY a.post.createdDate DESC",
+			countQuery = "SELECT COUNT(a) FROM Apply a WHERE a.post = :post")
+	Page<Apply> findAppliesByPost(@Param("post") Post post, Pageable pageable);
+  
 	@Query(value = "SELECT a FROM Apply a JOIN FETCH a.post WHERE a.user = :user ORDER BY a.post.createdDate DESC",
 			countQuery = "SELECT COUNT(a) FROM Apply a WHERE a.user = :user")
 	Page<Apply> findAllByUser(@Param("user") User user, Pageable pageable);

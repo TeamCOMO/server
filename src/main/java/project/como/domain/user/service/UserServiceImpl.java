@@ -2,8 +2,11 @@ package project.como.domain.user.service;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,6 +14,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.como.domain.apply.model.Apply;
+import project.como.domain.apply.repository.ApplyRepository;
+import project.como.domain.post.exception.PostAccessDeniedException;
+import project.como.domain.post.exception.PostNotFoundException;
+import project.como.domain.post.model.Post;
+import project.como.domain.post.repository.PostRepository;
+import project.como.domain.user.dto.request.MemberLoginRequestDto;
+import project.como.domain.user.dto.request.MemberSignupRequestDto;
+import project.como.domain.user.dto.request.MemberModifyRequestDto;
+import project.como.domain.user.dto.response.UsersResponseDto;
 import project.como.domain.user.dto.request.MemberLoginRequestDto;
 import project.como.domain.user.dto.request.MemberSignupRequestDto;
 import project.como.domain.user.dto.request.MemberModifyRequestDto;
@@ -31,12 +44,15 @@ import project.como.global.common.model.Helper;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	private final int TOTAL_ITEMS_PER_PAGE = 12;
 	private final UserRepository userRepository;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtProvider jwtProvider;
 	private final PasswordEncoder passwordEncoder;
 	private final ApiResponse response;
 	private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+	private final PostRepository postRepository;
+	private final ApplyRepository applyRepository;
 
 	@Transactional
 	public void signUp(MemberSignupRequestDto dto) throws Exception {
@@ -116,6 +132,16 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	public UsersResponseDto findByPost(String username, int pageNo, Long postId) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+		if (!user.getId().equals(post.getUser().getId())) throw new PostAccessDeniedException();
+
+		Page<Apply> applies = applyRepository.findAppliesByPost(post, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+		return UsersResponseDto.of(applies);
+  }
+  
 	public UserMypageResponseDto myPage(String username) {
 		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 		return UserMypageResponseDto.of(user);
