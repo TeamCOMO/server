@@ -153,7 +153,6 @@ public class PostService {
 	public PostDetailResponseDto getById(Long postId, String username) {
 		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId, username);
 
-		log.info("dto : {}", dto);
 		return dto;
 	}
 

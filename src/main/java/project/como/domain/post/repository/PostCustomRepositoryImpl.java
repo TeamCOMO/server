@@ -78,6 +78,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		return PostDetailResponseDto.builder()
 				.id(result.getId())
+				.writer(result.getUser().getNickname())
 				.createdDate(result.getCreatedDate().format(ISO_LOCAL_DATE))
 				.title(result.getTitle())
 				.body(result.getBody())
