@@ -70,7 +70,7 @@ public class PostController {
 		return ResponseEntity.ok().body(postService.getByApply(username, pageNo));
 	}
 
-	@GetMapping("/written-comment") // URI 가 Restful한가? -> 그건 아닌 거 같음. 일단 기능 구현 후, 고려
+	@GetMapping("/comment")
 	public ResponseEntity<PostsResponseDto> getPostsByMyComments(@CurrentUser String username,
 																 @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo){
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
