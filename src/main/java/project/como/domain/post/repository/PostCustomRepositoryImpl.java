@@ -4,6 +4,7 @@ import static java.time.format.DateTimeFormatter.*;
 import static project.como.domain.image.model.QImage.image;
 import static project.como.domain.post.model.QPost.post;
 import static project.como.domain.post.model.QPostTech.postTech;
+import static project.como.domain.user.model.QUser.*;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -33,6 +34,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
 		List<Post> tmp_posts = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
+				.join(post.user, user)
 				.where(categoryEq(category), containsTechs(stacks))
 				.orderBy(post.createdDate.desc())
 				.fetch();
@@ -42,6 +44,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 		List<PostPagingResponseDto> content = posts.stream().map(post -> {
 			PostPagingResponseDto dto = new PostPagingResponseDto();
 			dto.setId(post.getId());
+			dto.setNickname(post.getUser().getNickname());
 			dto.setCreatedDate(post.getCreatedDate().format(ISO_LOCAL_DATE));
 			dto.setTitle(post.getTitle());
 			dto.setCategory(post.getCategory());
