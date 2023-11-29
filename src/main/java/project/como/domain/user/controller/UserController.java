@@ -7,9 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.como.domain.user.dto.MemberLoginRequestDto;
-import project.como.domain.user.dto.MemberSignupRequestDto;
-import project.como.domain.user.dto.MemberModifyRequestDto;
+import project.como.domain.user.dto.request.MemberLoginRequestDto;
+import project.como.domain.user.dto.request.MemberSignupRequestDto;
+import project.como.domain.user.dto.request.MemberModifyRequestDto;
+import project.como.domain.user.dto.response.UsersResponseDto;
 import project.como.domain.user.service.CustomUserDetailsService;
 import project.como.domain.user.service.UserService;
 import project.como.global.auth.model.CurrentUser;
@@ -51,6 +52,14 @@ public class UserController {
 
 		if (check) return ResponseEntity.status(HttpStatus.CONFLICT).body(DUPLICATED);
 		return ResponseEntity.ok().body(NOT_DUPLICATED);
+	}
+
+	@Logging(item = "User", action = "get")
+	@GetMapping("/applied/{postId}")
+	public ResponseEntity<UsersResponseDto> findByPost(@CurrentUser String username,
+													   @PathVariable Long postId,
+													   @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
+		return ResponseEntity.ok().body(userService.findByPost(username, pageNo, postId));
 	}
 
 	@Logging(item = "User", action = "patch")
