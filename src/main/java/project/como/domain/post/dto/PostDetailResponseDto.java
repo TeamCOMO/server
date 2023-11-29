@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDetailResponseDto {
 	private Long id;
+	private String writer;
 	private String createdDate;
 	private String title;
 	private String body;

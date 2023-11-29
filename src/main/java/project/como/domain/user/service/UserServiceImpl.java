@@ -24,6 +24,10 @@ import project.como.domain.user.dto.request.MemberLoginRequestDto;
 import project.como.domain.user.dto.request.MemberSignupRequestDto;
 import project.como.domain.user.dto.request.MemberModifyRequestDto;
 import project.como.domain.user.dto.response.UsersResponseDto;
+import project.como.domain.user.dto.request.MemberLoginRequestDto;
+import project.como.domain.user.dto.request.MemberSignupRequestDto;
+import project.como.domain.user.dto.request.MemberModifyRequestDto;
+import project.como.domain.user.dto.response.UserMypageResponseDto;
 import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
@@ -136,5 +140,10 @@ public class UserServiceImpl implements UserService {
 
 		Page<Apply> applies = applyRepository.findAppliesByPost(post, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
 		return UsersResponseDto.of(applies);
+  }
+  
+	public UserMypageResponseDto myPage(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+		return UserMypageResponseDto.of(user);
 	}
 }

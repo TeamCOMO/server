@@ -6,6 +6,7 @@ import project.como.domain.user.dto.request.MemberLoginRequestDto;
 import project.como.domain.user.dto.request.MemberSignupRequestDto;
 import project.como.domain.user.dto.request.MemberModifyRequestDto;
 import project.como.domain.user.dto.response.UsersResponseDto;
+import project.como.domain.user.dto.response.UserMypageResponseDto;
 import project.como.domain.user.model.User;
 
 public interface UserService {
@@ -18,4 +19,5 @@ public interface UserService {
 	public void modify(String username, MemberModifyRequestDto dto);
 
 	UsersResponseDto findByPost(String username, int pageNo, Long postId);
+  UserMypageResponseDto myPage(String username);
 }
