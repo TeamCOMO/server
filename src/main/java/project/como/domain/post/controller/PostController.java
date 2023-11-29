@@ -35,7 +35,6 @@ public class PostController {
 	                                         @RequestPart @Valid PostCreateRequestDto dto,
 	                                         @RequestPart(required = false) @Size(max = 5) @Valid List<MultipartFile> images) {
 		URI location = URI.create(POST_API_ENDPOINT + postService.create(username, dto, images));
-
 		return ResponseEntity.created(location).build();
 	}
 
@@ -43,9 +42,7 @@ public class PostController {
 	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDetailResponseDto> getDetailPost(@CurrentUser String username,
 															   @PathVariable(value = "post_id", required = true) Long postId) {
-		PostDetailResponseDto dto = postService.getById(postId, username);
-
-		return ResponseEntity.ok().body(dto);
+		return ResponseEntity.ok().body(postService.getById(postId, username));
 	}
 
 	@Logging(item = "Post", action = "get")
@@ -54,21 +51,23 @@ public class PostController {
 			@RequestParam(required = false) List<String> stacks,
 			@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
-		PostsResponseDto dto = postService.getByCategory(pageNo, category, stacks);
-
-		return ResponseEntity.ok().body(dto);
+		return ResponseEntity.ok().body(postService.getByCategory(pageNo, category, stacks));
 	}
-
-
 
 	@Logging(item = "Post", action = "get")
 	@GetMapping("/myself")
 	public ResponseEntity<PostsResponseDto> getPostsByMyself(@CurrentUser String username,
 	                                                         @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
-		PostsResponseDto dto = postService.getByMyself(username, pageNo);
+		return ResponseEntity.ok().body(postService.getByMyself(username, pageNo));
+	}
 
-		return ResponseEntity.ok().body(dto);
+	@Logging(item = "Post", action = "get")
+	@GetMapping("/applied")
+	public ResponseEntity<PostsResponseDto> getAppliedPosts(@CurrentUser String username,
+															@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo) {
+		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
+		return ResponseEntity.ok().body(postService.getByApply(username, pageNo));
 	}
 
 	@GetMapping("/written-comment") // URI 가 Restful한가? -> 그건 아닌 거 같음. 일단 기능 구현 후, 고려
