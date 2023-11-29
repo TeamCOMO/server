@@ -53,7 +53,7 @@ import project.como.global.auth.exception.UnauthorizedException;
 @Transactional(readOnly = true)
 public class PostService {
 
-	private final int TOTAL_ITEMS_PER_PAGE = 20;
+	private final int TOTAL_ITEMS_PER_PAGE = 12;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final PostCustomRepository postCustomRepository;
