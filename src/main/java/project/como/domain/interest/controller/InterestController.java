@@ -39,7 +39,7 @@ public class InterestController {
     }
 
     //관심 삭제
-    @DeleteMapping("/post/interest/{interest_id}")
+    @DeleteMapping("/interest/{interest_id}")
     public ResponseEntity<String> deleteInterest(@PathVariable(name = "interest_id") Long interestId,
                                                  @CurrentUser String username){
         interestService.deleteInterest(interestId, username);
