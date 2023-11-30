@@ -3,10 +3,7 @@ package project.como.domain.interest.service;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
@@ -25,15 +22,18 @@ import project.como.domain.user.exception.UserNotFoundException;
 import project.como.domain.user.model.User;
 import project.como.domain.user.repository.UserRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InterestService {
-    private final int TOTAL_ITEMS_PER_PAGE = 20;
+    private final int TOTAL_ITEMS_PER_PAGE = 12;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final InterestRepository interestRepository;
@@ -50,10 +50,12 @@ public class InterestService {
         interestRepository.save(interest);
     }
 
-    public InterestResponseDto findInterests(String username, int pageNo, Pageable pageable){
+    public InterestResponseDto findInterests(String username, int pageNo){
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
         List<Interest> interests = interestRepository.findAllByUser(findUser);
-        Page<Interest> interestPostPage = new PageImpl<>(interests, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
+        Page<Interest> interestPostPage = new PageImpl<>(interests
+                , PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
+
 
         return InterestResponseDto.builder()
                 .totalPages(interestPostPage.getTotalPages())
@@ -61,12 +63,20 @@ public class InterestService {
                 .currentPage(pageNo)
                 .interests(interestPostPage.getContent().stream()
                         .map(i -> InterestDetailResponseDto.builder()
+                                .interestId(i.getId())
+                                .postId(i.getPost().getId())
                                 .title(i.getPost().getTitle())
                                 .body(i.getPost().getBody())
                                 .category(i.getPost().getCategory())
                                 .state(i.getPost().getState())
-                                .techs(getTechList(i.getPost().getTechList()))
+                                .techs(i.getPost().getTechList().stream()
+                                        .map(postTech -> postTech.getTech().getStack())
+                                        .collect(Collectors.toList()))
+                                .heartCount(i.getPost().getHeartCount())
+                                .readCount(i.getPost().getReadCount())
+                                .createdDate(i.getPost().getCreatedDate().format(ISO_LOCAL_DATE)) // 추가로 시:분은 표현된는게 낫지 않을까?
                                 .build())
+                        .sorted(Comparator.comparing(InterestDetailResponseDto::getCreatedDate))
                         .collect(Collectors.toList()))
                 .build();
     }

@@ -18,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.como.domain.apply.model.Apply;
+import project.como.domain.apply.repository.ApplyRepository;
 import project.como.domain.apply.service.ApplyService;
 import project.como.domain.comment.model.Comment;
 import project.como.domain.comment.repository.CommentRepository;
@@ -58,7 +60,7 @@ import project.como.global.auth.exception.UnauthorizedException;
 @Transactional(readOnly = true)
 public class PostService {
 
-	private final int TOTAL_ITEMS_PER_PAGE = 20;
+	private final int TOTAL_ITEMS_PER_PAGE = 12;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final PostCustomRepository postCustomRepository;
@@ -70,6 +72,7 @@ public class PostService {
 	private final TechRepository techRepository;
 	private final PostTechRepository postTechRepository;
 	private final ApplyService applyService;
+	private final ApplyRepository applyRepository;
 
 	@Transactional
 	public String create(String username, PostCreateRequestDto dto, @Nullable List<MultipartFile> images) {
@@ -158,7 +161,6 @@ public class PostService {
 	public PostDetailResponseDto getById(Long postId, String username) {
 		PostDetailResponseDto dto = postCustomRepository.findPostDetailById(postId, username);
 
-		log.info("dto : {}", dto);
 		return dto;
 	}
 
@@ -184,6 +186,7 @@ public class PostService {
 				.currentPage(postPage.getNumber())
 				.posts(postPage.stream().map(p -> PostPagingResponseDto.builder()
 						.id(p.getId())
+						.nickname(user.getNickname())
 						.title(p.getTitle())
 						.category(p.getCategory())
 						.state(p.getState())
@@ -195,7 +198,7 @@ public class PostService {
 				.build();
 	}
 
-	public PostsResponseDto getByMyComments(String username, int pageNo){
+	public PostsResponseDto getByMyComments(String username, int pageNo) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
 		List<Comment> comments = commentRepository.findAllByUser(user); // 내가 작성한 댓글 목록
 		List<Post> posts = comments.stream()
@@ -210,21 +213,46 @@ public class PostService {
 				.totalPages(postPage.getTotalPages())
 				.totalElements(postPage.getTotalElements())
 				.currentPage(postPage.getNumber())
-				.posts(postPage.stream().map( p -> PostPagingResponseDto.builder()
-						.id(p.getId())
-						.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
-						.title(p.getTitle())
-						.category(p.getCategory())
-						.state(p.getState())
-						.techs(p.getTechList().stream().distinct()
-								.map(postTech ->
-										postTech.getTech().getStack())
-								.collect(Collectors.toList()))
-						.heartCount(p.getHeartCount())
-						.readCount(p.getReadCount())
-						.build()
+				.posts(postPage.stream().map(p -> PostPagingResponseDto.builder()
+								.id(p.getId())
+								.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
+								.title(p.getTitle())
+								.category(p.getCategory())
+								.state(p.getState())
+								.techs(p.getTechList().stream().distinct()
+										.map(postTech ->
+												postTech.getTech().getStack())
+										.collect(Collectors.toList()))
+								.heartCount(p.getHeartCount())
+								.readCount(p.getReadCount())
+								.build()
 						)
 						.collect(Collectors.toList()))
+				.build();
+	}
+	public PostsResponseDto getByApply(String username, int pageNo) {
+		User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+		Page<Apply> applies = applyRepository.findAllByUser(user, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE));
+
+		return PostsResponseDto.builder()
+				.totalPages(applies.getTotalPages())
+				.totalElements(applies.getTotalElements())
+				.currentPage(applies.getNumber())
+				.posts(applies.stream().map(a -> {
+					Post post = a.getPost();
+					return PostPagingResponseDto.builder()
+							.id(post.getId())
+							.nickname(post.getUser().getNickname())
+							.title(post.getTitle())
+							.category(post.getCategory())
+							.state(post.getState())
+							.techs(post.getTechList().stream().distinct().map(pt -> pt.getTech().getStack()).toList())
+							.heartCount(post.getHeartCount())
+							.readCount(post.getReadCount())
+							.createdDate(post.getCreatedDate().format(ISO_LOCAL_DATE))
+							.build();
+                }).toList())
 				.build();
 	}
 
