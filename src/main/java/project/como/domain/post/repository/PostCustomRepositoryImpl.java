@@ -4,6 +4,7 @@ import static java.time.format.DateTimeFormatter.*;
 import static project.como.domain.image.model.QImage.image;
 import static project.como.domain.post.model.QPost.post;
 import static project.como.domain.post.model.QPostTech.postTech;
+import static project.como.domain.user.model.QUser.*;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -31,17 +32,19 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 	private final RedisDao redisDao;
 
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
-		List<Post> tmp_posts = queryFactory.selectFrom(post)
+		List<Post> posts = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
+				.join(post.user, user)
 				.where(categoryEq(category), containsTechs(stacks))
 				.orderBy(post.createdDate.desc())
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
 				.fetch();
-
-		List<Post> posts = tmp_posts.subList((int)pageable.getOffset(), Math.min((int)pageable.getOffset() + pageable.getPageSize(), tmp_posts.size()));
 
 		List<PostPagingResponseDto> content = posts.stream().map(post -> {
 			PostPagingResponseDto dto = new PostPagingResponseDto();
 			dto.setId(post.getId());
+			dto.setNickname(post.getUser().getNickname());
 			dto.setCreatedDate(post.getCreatedDate().format(ISO_LOCAL_DATE));
 			dto.setTitle(post.getTitle());
 			dto.setCategory(post.getCategory());
@@ -54,9 +57,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		JPAQuery<Long> countQuery = queryFactory.select(post.count())
 				.from(post)
-				.where(categoryEq(category), containsTechs(stacks))
-				.offset(pageable.getOffset())
-				.limit(pageable.getPageSize());
+				.where(categoryEq(category), containsTechs(stacks));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
@@ -78,6 +79,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		return PostDetailResponseDto.builder()
 				.id(result.getId())
+				.writer(result.getUser().getNickname())
 				.createdDate(result.getCreatedDate().format(ISO_LOCAL_DATE))
 				.title(result.getTitle())
 				.body(result.getBody())
