@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import project.como.domain.interest.model.Interest;
 import project.como.domain.post.model.Post;
 import project.como.domain.user.model.User;
@@ -17,5 +18,5 @@ public interface InterestRepository extends JpaRepository<Interest, Long> {
 
     @Modifying
     @Query("DELETE FROM Interest i WHERE i.post.id = :postId")
-    void deleteAllByPostId(Long postId);
+    void deleteAllByPostId(@Param("postId") Long postId);
 }

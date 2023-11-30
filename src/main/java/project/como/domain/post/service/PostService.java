@@ -4,10 +4,7 @@ import static java.time.format.DateTimeFormatter.*;
 
 import jakarta.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -200,12 +197,17 @@ public class PostService {
 
 	public PostsResponseDto getByMyComments(String username, int pageNo) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
-		List<Comment> comments = commentRepository.findAllByUser(user); // 내가 작성한 댓글 목록
+		List<Comment> comments = commentRepository.findAllByUser(user, PageRequest.of(0,60)); // 내가 작성한 댓글 목록
+		log.info("comments.size = {}", comments.size());
+		for(int i=0;i<comments.size(); i++){
+			log.info("c.getPostId = {}", comments.get(i).getPost().getId());
+		}
 		List<Post> posts = comments.stream()
 				.map(c -> c.getPost())
 				.distinct()
 				.sorted(Comparator.comparing(Post::getCreatedDate))
 				.collect(Collectors.toList());
+
 
 		PageImpl<Post> postPage = new PageImpl<>(posts, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), posts.size());
 
