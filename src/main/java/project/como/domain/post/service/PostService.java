@@ -5,11 +5,15 @@ import static java.time.format.DateTimeFormatter.*;
 import jakarta.annotation.Nullable;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.como.domain.apply.model.Apply;
 import project.como.domain.apply.repository.ApplyRepository;
 import project.como.domain.apply.service.ApplyService;
+import project.como.domain.comment.model.Comment;
 import project.como.domain.comment.repository.CommentRepository;
 import project.como.domain.image.model.Image;
 import project.como.domain.image.repository.ImageRepository;
@@ -190,6 +195,39 @@ public class PostService {
 						.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
 						.readCount(p.getReadCount())
 						.build()).toList())
+				.build();
+	}
+
+	public PostsResponseDto getByMyComments(String username, int pageNo){
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
+		List<Comment> comments = commentRepository.findAllByUser(user, PageRequest.of(0,100)); // 내가 작성한 댓글 목록
+		List<Post> posts = comments.stream()
+				.map(c -> c.getPost())
+				.distinct()
+				.sorted(Comparator.comparing(Post::getCreatedDate))
+				.collect(Collectors.toList());
+
+		PageImpl<Post> postPage = new PageImpl<>(posts, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), posts.size());
+
+		return PostsResponseDto.builder()
+				.totalPages(postPage.getTotalPages())
+				.totalElements(postPage.getTotalElements())
+				.currentPage(postPage.getNumber())
+				.posts(postPage.stream().map( p -> PostPagingResponseDto.builder()
+								.id(p.getId())
+								.createdDate(p.getCreatedDate().format(ISO_LOCAL_DATE))
+								.title(p.getTitle())
+								.category(p.getCategory())
+								.state(p.getState())
+								.techs(p.getTechList().stream().distinct()
+										.map(postTech ->
+												postTech.getTech().getStack())
+										.collect(Collectors.toList()))
+								.heartCount(p.getHeartCount())
+								.readCount(p.getReadCount())
+								.build()
+						)
+						.collect(Collectors.toList()))
 				.build();
 	}
 

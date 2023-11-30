@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
                 .body(dto.getBody())
                 .parent(findParent)
                 .build();
-
+        findPost.addComment(comment); // 생성된 comment 추가
 
         if(findParent != null) { // 자식 넣기
             findParent.addChild(comment);

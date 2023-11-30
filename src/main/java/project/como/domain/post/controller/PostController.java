@@ -69,6 +69,15 @@ public class PostController {
 		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
 		return ResponseEntity.ok().body(postService.getByApply(username, pageNo));
 	}
+	@Logging(item = "Post", action = "get")
+	@GetMapping("/comment")
+	public ResponseEntity<PostsResponseDto> getPostsByMyComments(@CurrentUser String username,
+																 @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo){
+		pageNo = (pageNo == 0) ? 0 : (pageNo - 1);
+		PostsResponseDto dto = postService.getByMyComments(username, pageNo);
+
+		return ResponseEntity.ok().body(dto);
+	}
 
 	@Logging(item = "Post", action = "patch")
 	@PatchMapping(consumes = {"application/json", "multipart/form-data"})
