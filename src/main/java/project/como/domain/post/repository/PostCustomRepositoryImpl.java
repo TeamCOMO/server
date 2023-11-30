@@ -32,14 +32,14 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 	private final RedisDao redisDao;
 
 	public Page<PostPagingResponseDto> findAllByCategoryAndTechs(Category category, List<String> stacks, Pageable pageable) {
-		List<Post> tmp_posts = queryFactory.selectFrom(post)
+		List<Post> posts = queryFactory.selectFrom(post)
 				.join(post.techList, postTech).fetchJoin()
 				.join(post.user, user)
 				.where(categoryEq(category), containsTechs(stacks))
 				.orderBy(post.createdDate.desc())
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
 				.fetch();
-
-		List<Post> posts = tmp_posts.subList((int)pageable.getOffset(), Math.min((int)pageable.getOffset() + pageable.getPageSize(), tmp_posts.size()));
 
 		List<PostPagingResponseDto> content = posts.stream().map(post -> {
 			PostPagingResponseDto dto = new PostPagingResponseDto();
@@ -57,9 +57,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 		JPAQuery<Long> countQuery = queryFactory.select(post.count())
 				.from(post)
-				.where(categoryEq(category), containsTechs(stacks))
-				.offset(pageable.getOffset())
-				.limit(pageable.getPageSize());
+				.where(categoryEq(category), containsTechs(stacks));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
