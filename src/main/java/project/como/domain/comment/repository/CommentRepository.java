@@ -1,6 +1,8 @@
 package project.como.domain.comment.repository;
 
 import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("DELETE FROM Comment c WHERE c.post.id = :postId")
     void deleteAllByPostId(@Param("postId") Long postId);
 
-    List<Comment> findAllByUser(User user);
+    @Query("select c from Comment c join fetch c.post p where c.user = :user " +
+            "group by p order by c.createdDate")
+    List<Comment> findAllByUser(@Param("user") User user, Pageable pageable);
 }

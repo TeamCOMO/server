@@ -200,7 +200,7 @@ public class PostService {
 
 	public PostsResponseDto getByMyComments(String username, int pageNo) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
-		List<Comment> comments = commentRepository.findAllByUser(user); // 내가 작성한 댓글 목록
+		List<Comment> comments = commentRepository.findAllByUser(user, PageRequest.of(0,60)); // 내가 작성한 댓글 목록
 		List<Post> posts = comments.stream()
 				.map(c -> c.getPost())
 				.distinct()
