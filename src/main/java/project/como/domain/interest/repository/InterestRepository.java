@@ -18,5 +18,5 @@ public interface InterestRepository extends JpaRepository<Interest, Long> {
 
     @Modifying
     @Query("DELETE FROM Interest i WHERE i.post.id = :postId")
-    void deleteAllByPostId(Long postId);
+    void deleteAllByPostId(@Param("postId")Long postId);
 }

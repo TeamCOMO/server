@@ -91,7 +91,7 @@ public class Post extends BaseTimeEntity {
 	public void discountHeart() { --this.heartCount; }
 
 	@OneToMany(mappedBy = "post")
-	private Collection<Comment> comment;
+	private Collection<Comment> comment = new ArrayList<>();
 
 	public Collection<Comment> getComment() {
 		return comment;
@@ -100,6 +100,8 @@ public class Post extends BaseTimeEntity {
 	public void setComment(Collection<Comment> comment) {
 		this.comment = comment;
 	}
+
+	public void addComment(Comment comment){this.comment.add(comment);}
 
 	public void addTech(PostTech tech) {
 		if (techList == null) techList = new ArrayList<>();
