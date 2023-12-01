@@ -41,18 +41,18 @@ public class JwtProvider {
 		key = Keys.hmacShaKeyFor(keyBase64Encoded.getBytes());
 	}
 
-	public TokenInfo generateToken(Authentication authentication) {
-		return generateToken(authentication.getName(), authentication.getAuthorities());
+	public TokenInfo generateToken(Authentication authentication, String nickname) {
+		return generateToken(authentication.getName(), authentication.getAuthorities(), nickname);
 	}
 
-	public TokenInfo generateToken(String name, Collection<? extends GrantedAuthority> inputAuthorities) {
+	public TokenInfo generateToken(String name, Collection<? extends GrantedAuthority> inputAuthorities, String nickname) {
 		String authorities = inputAuthorities.stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(","));
 
 		long now = (new Date()).getTime();
 
-		String accessToken = createAccessToken(name, authorities);
+		String accessToken = createAccessToken(name, authorities, nickname);
 
 		String refreshToken = createRefreshToken(name);
 
@@ -63,12 +63,13 @@ public class JwtProvider {
 				.build();
 	}
 
-	public String createAccessToken(String name, String authorities) {
+	public String createAccessToken(String name, String authorities, String nickname) {
 		Date date = new Date();
 		return BEARER_PREFIX + Jwts.builder()
 				.setSubject(name)
 				.claim("auth", authorities)
 				.claim("type", "access")
+				.claim("nickname", nickname)
 				.setExpiration(new Date(date.getTime() + 1000 * 60 * 60))
 				.setIssuedAt(date)
 				.signWith(key, SignatureAlgorithm.HS256)

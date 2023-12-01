@@ -72,7 +72,9 @@ public class UserServiceImpl implements UserService {
 
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-		TokenInfo tokenInfo = jwtProvider.generateToken(authentication);
+		User user = userRepository.findByUsername(dto.getUsername()).orElseThrow(UserNotFoundException::new);
+
+		TokenInfo tokenInfo = jwtProvider.generateToken(authentication, user.getNickname());
 
 		refreshTokenRedisRepository.save(RefreshToken.builder()
 				.id(authentication.getName())
@@ -85,7 +87,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional
-	public ResponseEntity<?> reissue(HttpServletRequest request) {
+	public ResponseEntity<?> reissue(HttpServletRequest request, String username) {
 		String token = jwtProvider.resolveToken(request);
 
 		if (token != null && jwtProvider.validateToken(token)) {
@@ -94,7 +96,8 @@ public class UserServiceImpl implements UserService {
 				if (refreshToken != null) {
 					String currentIp = Helper.getIp(request);
 					if (refreshToken.getIp().equals(currentIp)) {
-						TokenInfo tokenInfo = jwtProvider.generateToken(refreshToken.getId(), refreshToken.getAuthorities());
+						User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+						TokenInfo tokenInfo = jwtProvider.generateToken(refreshToken.getId(), refreshToken.getAuthorities(), user.getNickname());
 
 						refreshTokenRedisRepository.save(RefreshToken.builder()
 								.id(refreshToken.getId())

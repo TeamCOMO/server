@@ -34,6 +34,17 @@ public class SecurityConfig {
 	private final ComoExceptionHandler comoExceptionHandler;
 	private final OAuth2UserService oAuth2UserService;
 
+	private static final String[] AUTH_WHITELIST = {
+			"/oauth2/**",
+			"/user/ping",
+			"/user/sign-up",
+			"/user/sign-in",
+			"/user/check-duplicate/{username}",
+			"/user/current-user",
+			"/api/v1/post",
+			"/actuator/**"
+	};
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
@@ -48,15 +59,7 @@ public class SecurityConfig {
 				.accessDeniedHandler(comoExceptionHandler)
 				.and()
 				.authorizeHttpRequests()
-				.requestMatchers(new AntPathRequestMatcher("/oauth2/**")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/ping")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/sign-up")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/sign-in")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/check-duplicate/{username}")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/user/current-user")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/api/v1/post")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/api/v1/posts")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
+				.requestMatchers(AUTH_WHITELIST).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/HOST/**")).hasRole("어드민")
 				.anyRequest().authenticated()
 				.and()
@@ -103,6 +106,7 @@ public class SecurityConfig {
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin("http://localhost:3000");
 		config.addAllowedOrigin("http://localhost:8080");
+		config.addAllowedOrigin("http://3.34.140.151:8000");
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		config.addExposedHeader("Authorization");
