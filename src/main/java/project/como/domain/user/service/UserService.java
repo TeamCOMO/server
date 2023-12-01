@@ -14,7 +14,7 @@ public interface UserService {
 	String signIn(HttpServletRequest request, MemberLoginRequestDto dto);
 	void signUp(MemberSignupRequestDto dto) throws Exception;
 	boolean checkDuplicate(String username);
-	public ResponseEntity<?> reissue(HttpServletRequest request);
+	public ResponseEntity<?> reissue(HttpServletRequest request, String username);
 	public User getUser(String username);
 	public void modify(String username, MemberModifyRequestDto dto);
 
