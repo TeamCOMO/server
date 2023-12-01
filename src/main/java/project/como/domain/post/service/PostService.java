@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -201,13 +202,16 @@ public class PostService {
 	public PostsResponseDto getByMyComments(String username, int pageNo){
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException());
 		List<Comment> comments = commentRepository.findAllByUser(user, PageRequest.of(0,100)); // 내가 작성한 댓글 목록
+
 		List<Post> posts = comments.stream()
 				.map(c -> c.getPost())
-				.distinct()
 				.sorted(Comparator.comparing(Post::getCreatedDate))
 				.collect(Collectors.toList());
 
-		PageImpl<Post> postPage = new PageImpl<>(posts, PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), posts.size());
+		Pageable pageable = PageRequest.of(pageNo,TOTAL_ITEMS_PER_PAGE);
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), posts.size());
+		PageImpl<Post> postPage = new PageImpl<>(posts.subList(start, end), pageable, posts.size());
 
 		return PostsResponseDto.builder()
 				.totalPages(postPage.getTotalPages())
