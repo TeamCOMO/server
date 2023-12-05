@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
+import project.como.domain.interest.dto.InterestCreateResponseDto;
 import project.como.domain.interest.dto.InterestDetailResponseDto;
 import project.como.domain.interest.dto.InterestResponseDto;
 import project.como.domain.interest.exception.AlreadyInterestException;
@@ -39,7 +40,7 @@ public class InterestService {
     private final InterestRepository interestRepository;
 
     @Transactional
-    public void createInterest(String username, InterestCreateRequestDto dto){
+    public InterestCreateResponseDto createInterest(String username, InterestCreateRequestDto dto){
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
         Post findPost = postRepository.findById(dto.getPostId()).orElseThrow(() -> new PostNotFoundException(dto.getPostId()));
 
@@ -47,7 +48,8 @@ public class InterestService {
             throw new AlreadyInterestException(findUser.getId(), findPost.getId());
         }
         Interest interest = dto.toEntity(findUser, findPost);
-        interestRepository.save(interest);
+
+        return InterestCreateResponseDto.of(interestRepository.save(interest).getId());
     }
 
     public InterestResponseDto findInterests(String username, int pageNo){

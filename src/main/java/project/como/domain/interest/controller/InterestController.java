@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.como.domain.interest.dto.InterestCreateRequestDto;
+import project.como.domain.interest.dto.InterestCreateResponseDto;
 import project.como.domain.interest.dto.InterestResponseDto;
 import project.como.domain.interest.service.InterestService;
 import project.como.global.auth.model.CurrentUser;
@@ -20,11 +21,10 @@ public class InterestController {
 
     //관심 등록
     @PostMapping("/interest")
-    public ResponseEntity<String> registryInterest(@CurrentUser String username,
-                                                   @RequestBody @Valid InterestCreateRequestDto dto){
-        interestService.createInterest(username, dto);
-        URI location = URI.create(INTEREST_API_ENDPOINT);
-        return ResponseEntity.created(location).build();
+    public ResponseEntity<InterestCreateResponseDto> registryInterest(@CurrentUser String username,
+                                                                      @RequestBody @Valid InterestCreateRequestDto dto){
+
+        return ResponseEntity.ok().body(interestService.createInterest(username, dto));
     }
 
     //단일 관심 조회는 필요 없어 보여서 만들지 않음.
