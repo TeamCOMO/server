@@ -36,20 +36,20 @@ jobs:
       run: |
         ./build.sh
     
-   CD:
-     - name: Login to DockerHub
+  CD:
+    - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
 
-     - name: Run deployment script on remote host
-       uses: appleboy/ssh-action@master
-       with:
-         host: ${{ secrets.HOST_DEV }} 
-         #username: ${{ secrets.USERNAME }} #key로 접근해서 필요 없어 보임
-         #password: ${{ secrets.PASSWORD }}
-         port: 22
-         key: ${{ COMO_SSH_KEY }}
-         script: |
-           ./build.sh
+    - name: Run deployment script on remote host
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_DEV }}
+        #username: ${{ secrets.USERNAME }} #key로 접근해서 필요 없어 보임
+        #password: ${{ secrets.PASSWORD }}
+        port: 22
+        key: ${{ COMO_SSH_KEY }}
+        script: |
+          ./build.sh
