@@ -1,5 +1,8 @@
 [submodule "submodule-config"]
-	path = submodule-config
-	url = git@github.com:TeamCOMO/submodule-config.git
-	branch = main	
+
+	path = src/main/resources #submodule 내용을 직접 가져옴. 다른 방법으로는 gradle.build에 copy 해오는 방식 등이 있음. 
+	url = git@github.com:TeamCOMO/submodule-config.git # submodule repo(ssh)
+	branch = main
+	#.gitmodules은 submodule에 관한 설정 파일
+
 	
