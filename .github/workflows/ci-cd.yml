@@ -32,11 +32,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
 
-    - name: Build and Docker Push # 만들어진 배포 스크립트 실행
+    - name: Build and Docker Push # 만들어진 빌드 스크립트 실행
       run: |
         ./build.sh
     
   CD:
+    steps:
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
@@ -50,6 +51,6 @@ jobs:
         #username: ${{ secrets.USERNAME }} #key로 접근해서 필요 없어 보임
         #password: ${{ secrets.PASSWORD }}
         port: 22
-        key: ${{ COMO_SSH_KEY }}
-        script: |
+        key: ${{ secrets.COMO_SSH_KEY }}
+        run: | # 배포 스크립트를 통해 이미지 pull하고 컨테이너 실행
           ./build.sh
