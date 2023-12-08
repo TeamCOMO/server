@@ -48,7 +48,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST_DEV }}
-        #username: ${{ secrets.USERNAME }} #key로 접근해서 필요 없어 보임
+        username: ${{ secrets.SSH_USERNAME }} #key로 접근해서 필요 없어 보임
         #password: ${{ secrets.PASSWORD }}
         port: 22
         key: ${{ secrets.COMO_SSH_KEY }}
