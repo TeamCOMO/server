@@ -1,5 +1,5 @@
 [submodule "submodule-config"]
 	path = submodule-config
 	url = git@github.com:TeamCOMO/submodule-config.git
-	branch = main
+	branch = main	
 	
