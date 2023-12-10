@@ -25,24 +25,25 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     
-#    - name: Login to DockerHub
-#      uses: docker/login-action@v1
-#      with:
-#        username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
-#        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
 
     - name: Build and Docker Push # 만들어진 빌드 스크립트 실행
       run: |
+        chmod +x build.sh 
         ./build.sh
-    
+
   CD:
     runs-on: ubuntu-latest
     steps:
-#    - name: Login to DockerHub
-#      uses: docker/login-action@v1
-#      with:
-#        username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
-#        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}  # 김승진 아이디로 설정
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # 김승진 비밀번호로 설정
 
     - name: Run deployment script on remote host
       uses: appleboy/ssh-action@master
@@ -53,4 +54,5 @@ jobs:
         port: 22
         key: ${{ secrets.COMO_SSH_KEY }}
         run: | # 배포 스크립트를 통해 이미지 pull하고 컨테이너 실행
+          chmod +x build.sh
           ./build.sh
