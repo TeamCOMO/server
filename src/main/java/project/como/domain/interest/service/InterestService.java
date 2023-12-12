@@ -55,9 +55,13 @@ public class InterestService {
     public InterestResponseDto findInterests(String username, int pageNo){
         User findUser = userRepository.findByUsername(username).orElseThrow(() ->new UserNotFoundException());
         List<Interest> interests = interestRepository.findAllByUser(findUser);
-        Page<Interest> interestPostPage = new PageImpl<>(interests
-                , PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
-
+//        Page<Interest> interestPostPage = new PageImpl<>(interests
+//                , PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
+        Pageable pageable = PageRequest.of(pageNo,TOTAL_ITEMS_PER_PAGE);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), interests.size());
+        Page<Interest> interestPostPage = new PageImpl<>(
+                interests.subList(start, end), PageRequest.of(pageNo, TOTAL_ITEMS_PER_PAGE), interests.size());
 
         return InterestResponseDto.builder()
                 .totalPages(interestPostPage.getTotalPages())
